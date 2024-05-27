@@ -7,7 +7,7 @@ import java.io.*;
 public class PersistenceJson {
     /*
     TODO:21 -> comprovar que funciona el JSon, con el ticket. NO HACER HASTA QUE SE HAYA HECHO
-        LA CREACION DEL TICKET!
+        LA CREACION DEL TICKET! 
      */
     private static PersistenceJson instance;
     private String file = "florist.txt";
