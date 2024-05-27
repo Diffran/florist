@@ -1,12 +1,18 @@
 package florist.menus;
 
+import florist.connection.ConnectionSQL;
+import florist.exceptions.EmptySQLTableException;
+
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class MainMenu {
     private static String option;
     public static final Scanner SC = new Scanner(System.in);
+    public static ConnectionSQL connexion;
 
     public static void mainMenu(){
+        connexion = ConnectionSQL.getInstance();
         do{
             System.out.println("-----------MAIN MENU--------------");
             System.out.println("1- CREATE NEW FLORIST");
@@ -19,19 +25,18 @@ public class MainMenu {
                 switch (option) {
                     case "1":
                         System.out.println("create florist: " + floristName());
-                        //TODO:1-createFloristSQL metode que rep un String amb el nom de la florist i la crea a la BD
+                        connexion.createFlorist();
                         break;
                     case "2":
                         System.out.println("se imprimen todas las florist");//borrar
-                        //TODO:5- printFlorist() metode que imprimeix per pantalla totes les florist desde la BD
+                        connexion.printFlorist();
                         loadMenuFlorist();
                         break;
                     case "3":
                         System.out.println("se imprimen todas las florist");//borrar
                         floristName();
-                        //TODO:5- printFlorist() metode que imprimeix per pantalla totes les florist desde la BD
-                        //TODO:3- int selectIDFlorist(String floristName) metode que entra el nom de la florist i busca a la BD per return un int del ID. ha de comprovar si existeix i tirar exception si no
-                        //TODO:2-deleteFloristSQL(int ID) metode que rep un ID de florist i delete de la BD, return boolean i depenent del return println "removed", "error lo que sea"
+                        connexion.printFlorist();
+                        connexion.deleteFlorist();
                         break;
                     case "4":
                         System.out.println("Exiting the program...");
@@ -53,11 +58,17 @@ public class MainMenu {
         return SC.nextLine();
     }
 
-    private static void loadMenuFlorist() {
-        //TODO:3-selectIDFlorist(String floristName) metode que entra el nom de la florist i busca a la BD per return un int del ID. ha de comprovar si existeix i tirar exception si no
-        //TODO:4- MenuFlorist.menuFlorist(entrar el ID de la florist);
-        //aixo sha de borrar, es només per fer les proves
-        System.out.println("entering de menu of florist: "+floristName());//borrar
-        MenuFlorist.menuFlorist(1);//borrar
+    private static void loadMenuFlorist() throws NumberFormatException, EmptySQLTableException, SQLException {
+        int id;
+        String userData;
+
+        System.out.println("Please enter the ID of the florist you'd like to manage:");
+        userData= SC.nextLine();
+        id= Integer.parseInt(userData);
+        if(connexion.floristExist(id)){
+            MenuFlorist.menuFlorist(id);
+        }else{
+            System.out.println("florist not found");
+        }
     }
 }
