@@ -3,7 +3,7 @@ package florist.menus;
 public class MenuFlorist {
     private static String optionFlorist;
     private static String optionTicket;
-    private static String optonStock;
+    private static String optionStock;
 
     private static int floristID;
 
@@ -87,9 +87,9 @@ public class MenuFlorist {
             System.out.println("4- LIST STOCK");
             System.out.println("5- EXIT");
 
-            optonStock = MainMenu.SC.nextLine();
+            optionStock = MainMenu.SC.nextLine();
             try {
-                switch (optonStock) {
+                switch (optionStock) {
                     case "1":
                         System.out.println("add product");//borrar
                         /*
