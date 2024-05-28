@@ -1,10 +1,6 @@
 package florist.models;
 
-@Entity
-@Table(name = "FLORIST")
 public class Florist {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idFLORIST;
 
     private String name;

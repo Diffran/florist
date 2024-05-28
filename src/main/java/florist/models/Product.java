@@ -1,8 +1,5 @@
 package florist.models;
 
-
-@Entity
-@Table(name = "PRODUCT")
 public class Product {
     /*
     TODO:19- ESTO TIENE QUE SER UNA ABSTRACT CLASS PARA PODER HACER las factoryes, hay que arreglar la
@@ -12,8 +9,6 @@ public class Product {
         BD.
         Este TODO implica a las classes FLORIST, PRODUCT,TICKET i probablemente ProductFactory.
      */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idPRODUCT;
 
     private String name;
