@@ -1,6 +1,6 @@
-package florist.models;
+package florist.models.product;
 
-public class Product {
+public abstract class Product {
     /*
     TODO:19- ESTO TIENE QUE SER UNA ABSTRACT CLASS PARA PODER HACER las factoryes, hay que arreglar la
         factory tambien, i esto arreglar-lo, los @no los necssitamos para nada, ver que falta i sobra en relacion a la
@@ -13,10 +13,6 @@ public class Product {
 
     private String name;
     private double price;
-    private String type;
-    private String color;
-    private double height;
-    private String materialType;
 
 
     public int getIdPRODUCT() {
@@ -41,37 +37,5 @@ public class Product {
 
     public void setPrice(double price) {
         this.price = price;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
-    public double getHeight() {
-        return height;
-    }
-
-    public void setHeight(double height) {
-        this.height = height;
-    }
-
-    public String getMaterialType() {
-        return materialType;
-    }
-
-    public void setMaterialType(String materialType) {
-        this.materialType = materialType;
     }
 }

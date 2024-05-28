@@ -1,4 +1,4 @@
-package florist.connection;
+package florist.services.persistence;
 
 import florist.models.Florist;
 

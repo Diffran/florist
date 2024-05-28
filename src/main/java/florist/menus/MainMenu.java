@@ -1,6 +1,6 @@
 package florist.menus;
 
-import florist.connection.ConnectionSQL;
+import florist.services.sql.ConnectionSQL;
 import florist.exceptions.EmptySQLTableException;
 
 import java.sql.SQLException;

@@ -1,14 +1,15 @@
 package florist.models;
 
+import java.util.Date;
+
 @Entity
 @Table(name = "TICKET")
-
 public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idTICKET;
 
-    private LocalDateTime date;
+    private Date date;
 
     @ManyToOne
     @JoinColumn(name = "idFLORIST", nullable = false)
@@ -22,11 +23,11 @@ public class Ticket {
         this.idTICKET = idTICKET;
     }
 
-    public LocalDateTime getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(LocalDateTime date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

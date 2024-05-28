@@ -1,4 +1,4 @@
-package florist.models;
+package florist.models.product;
 
 public enum MaterialDecorationType {
     WOOD("Wood"),

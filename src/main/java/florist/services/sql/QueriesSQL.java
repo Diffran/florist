@@ -1,4 +1,4 @@
-package florist.connection;
+package florist.services.sql;
 
 public class QueriesSQL {
     //main menu

@@ -1,11 +1,9 @@
-package florist.connection;
-import florist.Main;
+package florist.services.sql;
 import florist.exceptions.EmptySQLTableException;
 import florist.exceptions.EmptyStringException;
 import florist.menus.MainMenu;
 
 import java.sql.*;
-import java.util.InputMismatchException;
 
 public class ConnectionSQL {
     private Connection connection;
