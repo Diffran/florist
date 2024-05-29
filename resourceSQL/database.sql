@@ -1,12 +1,10 @@
 -- MySQL Workbench Forward Engineering
 
-SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
-SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
 -- -----------------------------------------------------
 -- Schema florist
 -- -----------------------------------------------------
+DROP SCHEMA IF EXISTS `florist` ;
 
 -- -----------------------------------------------------
 -- Schema florist
@@ -15,130 +13,107 @@ CREATE SCHEMA IF NOT EXISTS `florist` DEFAULT CHARACTER SET utf8 ;
 USE `florist` ;
 
 -- -----------------------------------------------------
--- Table `florist`.`PRODUCT`
+-- Table `florist`.`florist`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `florist`.`PRODUCT` (
-  `idPRODUCT` INT NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `florist`.`florist` (
+  `id_florist` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) NOT NULL,
+  `total_stock_value` DOUBLE NOT NULL,
+  PRIMARY KEY (`id_florist`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `florist`.`stock`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `florist`.`stock` (
+  `id_stock` INT NOT NULL AUTO_INCREMENT,
+  `florist_id_florist` INT NOT NULL,
+  PRIMARY KEY (`id_stock`),
+  INDEX `fk_stock_florist_idx` (`florist_id_florist` ASC) VISIBLE,
+  CONSTRAINT `fk_stock_florist`
+    FOREIGN KEY (`florist_id_florist`)
+    REFERENCES `florist`.`florist` (`id_florist`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `florist`.`product`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `florist`.`product` (
+  `id_product` INT NOT NULL AUTO_INCREMENT,
   `price` DOUBLE NOT NULL,
   `name` VARCHAR(45) NOT NULL,
-  `type` ENUM('tree', 'flower', 'decoration') NOT NULL,
+  `type` ENUM("tree", "flower", "decoration") NULL,
   `color` VARCHAR(45) NULL,
   `height` DOUBLE NULL,
-  `materialType` ENUM('wood', 'plastic') NULL,
-  PRIMARY KEY (`idPRODUCT`))
+  `material_type` ENUM("wood", "plastic") NULL,
+  PRIMARY KEY (`id_product`))
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `florist`.`FLORIST`
+-- Table `florist`.`ticket`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `florist`.`FLORIST` (
-  `idFLORIST` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(45) NOT NULL,
-  `totalStockValue` DOUBLE NOT NULL DEFAULT 0,
-  PRIMARY KEY (`idFLORIST`))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `florist`.`TICKET`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `florist`.`TICKET` (
-  `idTICKET` INT NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `florist`.`ticket` (
+  `id_ticket` INT NOT NULL AUTO_INCREMENT,
   `date` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `idFLORIST` INT NOT NULL,
-  `totalPrice` DOUBLE NOT NULL DEFAULT 0,
-  PRIMARY KEY (`idTICKET`),
-  INDEX `fk_TICKET_FLORIST1_idx` (`idFLORIST` ASC) VISIBLE,
-  CONSTRAINT `fk_TICKET_FLORIST1`
-    FOREIGN KEY (`idFLORIST`)
-    REFERENCES `florist`.`FLORIST` (`idFLORIST`)
+  `total_price` DOUBLE NOT NULL,
+  `florist_id_florist` INT NOT NULL,
+  PRIMARY KEY (`id_ticket`),
+  INDEX `fk_ticket_florist1_idx` (`florist_id_florist` ASC) VISIBLE,
+  CONSTRAINT `fk_ticket_florist1`
+    FOREIGN KEY (`florist_id_florist`)
+    REFERENCES `florist`.`florist` (`id_florist`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `florist`.`STOCK`
+-- Table `florist`.`stock_has_product`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `florist`.`STOCK` (
-  `idSTOCK` INT NOT NULL AUTO_INCREMENT,
-  `idFLORIST` INT NOT NULL,
-  PRIMARY KEY (`idSTOCK`),
-  INDEX `fk_STOCK_FLORIST1_idx` (`idFLORIST` ASC) VISIBLE,
-  CONSTRAINT `fk_STOCK_FLORIST1`
-    FOREIGN KEY (`idFLORIST`)
-    REFERENCES `florist`.`FLORIST` (`idFLORIST`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `florist`.`STOCK_has_PRODUCT`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `florist`.`STOCK_has_PRODUCT` (
-  `idSTOCK` INT NOT NULL AUTO_INCREMENT,
-  `idPRODUCT` INT NOT NULL,
-  `quantity` INT NOT NULL DEFAULT 0,
-  INDEX `fk_STOCK_has_PRODUCT_PRODUCT1_idx` (`idPRODUCT` ASC) VISIBLE,
-  INDEX `fk_STOCK_has_PRODUCT_STOCK1_idx` (`idSTOCK` ASC) VISIBLE,
-  CONSTRAINT `fk_STOCK_has_PRODUCT_STOCK1`
-    FOREIGN KEY (`idSTOCK`)
-    REFERENCES `florist`.`STOCK` (`idSTOCK`)
+CREATE TABLE IF NOT EXISTS `florist`.`stock_has_product` (
+  `quantity` INT NOT NULL,
+  `stock_id_stock` INT NOT NULL,
+  `product_id_product` INT NOT NULL,
+  INDEX `fk_stock_has_product_stock1_idx` (`stock_id_stock` ASC) VISIBLE,
+  INDEX `fk_stock_has_product_product1_idx` (`product_id_product` ASC) VISIBLE,
+  CONSTRAINT `fk_stock_has_product_stock1`
+    FOREIGN KEY (`stock_id_stock`)
+    REFERENCES `florist`.`stock` (`id_stock`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_STOCK_has_PRODUCT_PRODUCT1`
-    FOREIGN KEY (`idPRODUCT`)
-    REFERENCES `florist`.`PRODUCT` (`idPRODUCT`)
+  CONSTRAINT `fk_stock_has_product_product1`
+    FOREIGN KEY (`product_id_product`)
+    REFERENCES `florist`.`product` (`id_product`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `florist`.`PRODUCT_has_TICKET`
+-- Table `florist`.`product_has_ticket`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `florist`.`PRODUCT_has_TICKET` (
-  `idPRODUCT` INT NOT NULL,
-  `idTICKET` INT NOT NULL,
-  `quantity` INT NOT NULL DEFAULT 0,
-  INDEX `fk_PRODUCT_has_TICKET_TICKET1_idx` (`idTICKET` ASC) VISIBLE,
-  INDEX `fk_PRODUCT_has_TICKET_PRODUCT1_idx` (`idPRODUCT` ASC) VISIBLE,
-  CONSTRAINT `fk_PRODUCT_has_TICKET_PRODUCT1`
-    FOREIGN KEY (`idPRODUCT`)
-    REFERENCES `florist`.`PRODUCT` (`idPRODUCT`)
+CREATE TABLE IF NOT EXISTS `florist`.`product_has_ticket` (
+  `quantity` INT NOT NULL,
+  `ticket_id_ticket` INT NOT NULL,
+  `product_id_product` INT NOT NULL,
+  INDEX `fk_product_has_ticket_ticket1_idx` (`ticket_id_ticket` ASC) VISIBLE,
+  INDEX `fk_product_has_ticket_product1_idx` (`product_id_product` ASC) VISIBLE,
+  CONSTRAINT `fk_product_has_ticket_ticket1`
+    FOREIGN KEY (`ticket_id_ticket`)
+    REFERENCES `florist`.`ticket` (`id_ticket`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_PRODUCT_has_TICKET_TICKET1`
-    FOREIGN KEY (`idTICKET`)
-    REFERENCES `florist`.`TICKET` (`idTICKET`)
+  CONSTRAINT `fk_product_has_ticket_product1`
+    FOREIGN KEY (`product_id_product`)
+    REFERENCES `florist`.`product` (`id_product`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
-ALTER TABLE STOCK
-ADD CONSTRAINT fk_stock_florist
-FOREIGN KEY (idFLORIST) REFERENCES FLORIST(idFLORIST) ON DELETE CASCADE;
-
-ALTER TABLE STOCK_has_PRODUCT
-ADD CONSTRAINT fk_stock_has_product_stock
-FOREIGN KEY (idSTOCK) REFERENCES STOCK(idSTOCK) ON DELETE CASCADE,
-ADD CONSTRAINT fk_stock_has_product_product
-FOREIGN KEY (idPRODUCT) REFERENCES PRODUCT(idPRODUCT) ON DELETE CASCADE;
-
-ALTER TABLE TICKET
-ADD CONSTRAINT fk_ticket_florist
-FOREIGN KEY (idFLORIST) REFERENCES FLORIST(idFLORIST) ON DELETE CASCADE;
-
-ALTER TABLE PRODUCT_has_TICKET
-ADD CONSTRAINT fk_product_has_ticket_product
-FOREIGN KEY (idPRODUCT) REFERENCES PRODUCT(idPRODUCT) ON DELETE CASCADE,
-ADD CONSTRAINT fk_product_has_ticket_ticket
-FOREIGN KEY (idTICKET) REFERENCES TICKET(idTICKET) ON DELETE CASCADE;
 
