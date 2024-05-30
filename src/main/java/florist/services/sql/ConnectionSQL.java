@@ -134,5 +134,104 @@ public class ConnectionSQL {
 
     }
 
+    public void addTree() throws SQLException, EmptyStringException {
+        try {
+            stmt = getConnection().prepareStatement(QueriesSQL.addProductSQL);
+
+            System.out.println("Enter Tree name: ");
+            String name = MainMenu.SC.nextLine();
+            System.out.println("Enter Tree price: ");
+            double price = Double.parseDouble(MainMenu.SC.nextLine());
+            System.out.println("Enter Tree height in cm: ");
+            double height = Double.parseDouble(MainMenu.SC.nextLine());
+            System.out.println("Enter Tree quantity: ");
+            int quantity = Integer.parseInt(MainMenu.SC.nextLine());
+
+            if (!name.isEmpty()) {
+                stmt.setDouble(1, price);
+                stmt.setString(2, name);
+                stmt.setString(3, "tree");
+                stmt.setNull(4, Types.VARCHAR); // color
+                stmt.setDouble(5, height);
+                stmt.setNull(6, Types.VARCHAR); // material_type
+                stmt.setInt(7, quantity);
+                stmt.executeUpdate();
+                System.out.println("Tree: " + name + " added to the database");
+            } else {
+                throw new EmptyStringException("at add Tree");
+            }
+
+            disconnect();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void addFlower() throws SQLException, EmptyStringException {
+        try {
+            stmt = getConnection().prepareStatement(QueriesSQL.addProductSQL);
+
+            System.out.println("Enter Flower name: ");
+            String name = MainMenu.SC.nextLine();
+            System.out.println("Enter Flower price: ");
+            double price = Double.parseDouble(MainMenu.SC.nextLine());
+            System.out.println("Enter Flower color: ");
+            String color = MainMenu.SC.nextLine();
+            System.out.println("Enter Flower quantity: ");
+            int quantity = Integer.parseInt(MainMenu.SC.nextLine());
+
+            if (!name.isEmpty()) {
+                stmt.setDouble(1, price);
+                stmt.setString(2, name);
+                stmt.setString(3, "flower");
+                stmt.setString(4, color);
+                stmt.setNull(5, Types.DOUBLE); // height
+                stmt.setNull(6, Types.VARCHAR); // material_type
+                stmt.setInt(7, quantity);
+                stmt.executeUpdate();
+                System.out.println("Flower: " + name + " added to the database");
+            } else {
+                throw new EmptyStringException("at add Flower");
+            }
+
+            disconnect();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void addDecoration() throws SQLException, EmptyStringException {
+        try {
+            stmt = getConnection().prepareStatement(QueriesSQL.addProductSQL);
+
+            System.out.println("Enter Decoration name: ");
+            String name = MainMenu.SC.nextLine();
+            System.out.println("Enter Decoration price: ");
+            double price = Double.parseDouble(MainMenu.SC.nextLine());
+            System.out.println("Enter Decoration material type (wood/plastic): ");
+            //TODO: personalizar exception sql por tipo mal ingresado en programa
+            String materialType = MainMenu.SC.nextLine();
+            System.out.println("Enter Decoration quantity: ");
+            int quantity = Integer.parseInt(MainMenu.SC.nextLine());
+
+            if (!name.isEmpty()) {
+                stmt.setDouble(1, price);
+                stmt.setString(2, name);
+                stmt.setString(3, "decoration");
+                stmt.setNull(4, Types.VARCHAR); // color
+                stmt.setNull(5, Types.DOUBLE); // height
+                stmt.setString(6, materialType);
+                stmt.setInt(7, quantity);
+                stmt.executeUpdate();
+                System.out.println("Decoration: " + name + " added to the database");
+            } else {
+                throw new EmptyStringException("at add Decoration");
+            }
+
+            disconnect();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
 }

@@ -9,37 +9,42 @@ import java.util.Scanner;
 public class MainMenu {
     private static String option;
     public static final Scanner SC = new Scanner(System.in);
-    public static ConnectionSQL connexion;
+    public static ConnectionSQL connection;
 
     public static void mainMenu(){
-        connexion = ConnectionSQL.getInstance();
+        connection = ConnectionSQL.getInstance();
         do{
             System.out.println("-----------MAIN MENU--------------");
             System.out.println("1- CREATE NEW FLORIST");
             System.out.println("2- LOAD FLORIST");
             System.out.println("3- DELETE FLORIST");
-            System.out.println("4- EXIT");
+            System.out.println("4- ADD NEW PRODUCT");
+            System.out.println("5- EXIT");
 
             option = SC.nextLine();
             try {
                 switch (option) {
                     case "1":
-                        System.out.println("create florist: " + floristName());
-                        connexion.createFlorist();
+                        connection.createFlorist();
                         break;
                     case "2":
-                        System.out.println("se imprimen todas las florist");//borrar
-                        connexion.printFlorist();
+                        connection.printFlorist();
                         loadMenuFlorist();
                         break;
                     case "3":
                         System.out.println("se imprimen todas las florist");//borrar
                         floristName();
-                        connexion.printFlorist();
-                        connexion.deleteFlorist();
+                        connection.printFlorist();
+                        connection.deleteFlorist();
                         break;
                     case "4":
-                        System.out.println("Exiting the program...");
+                        System.out.println("Add a new product to general stock");
+                        MenuAddProduct.menuAddProduct();
+
+                        break;
+                        //TODO: ADD METHOD addNewProductToGenStock()
+                    case "5":
+                        System.out.println("Exit program...");
                         SC.close();
                         System.exit(0);
                         break;
@@ -65,7 +70,7 @@ public class MainMenu {
         System.out.println("Please enter the ID of the florist you'd like to manage:");
         userData= SC.nextLine();
         id= Integer.parseInt(userData);
-        if(connexion.floristExist(id)){
+        if(connection.floristExist(id)){
             MenuFlorist.menuFlorist(id);
         }else{
             System.out.println("florist not found");

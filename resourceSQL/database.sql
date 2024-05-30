@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS `florist`.`product` (
   `color` VARCHAR(45) NULL,
   `height` DOUBLE NULL,
   `material_type` ENUM("wood", "plastic") NULL,
+  `quantity` INT NULL,
   PRIMARY KEY (`id_product`));
 
 

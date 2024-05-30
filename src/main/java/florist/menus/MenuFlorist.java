@@ -92,11 +92,13 @@ public class MenuFlorist {
                 switch (optionStock) {
                     case "1":
                         System.out.println("add product");//borrar
+
                         /*
-                        TODO:8- printIndividualStockList(int floristID) -> MenuFlorist-TODO:11
+                        TODO:8- printMainStockList() -> MenuFlorist-TODO:11
                          */
 
-                        /*TODO:9- addProdutToStock(int floristID, int productID, int quantity) -> connectar con la BD buscar el
+
+                        /*TODO:9- addProdutToStock(int floristID) -> connectar con la BD buscar el
                             stock correspondiente al floristID i sumarle a quantity del producto la cantidad agregada.imprime por pantalla
                             si ha tenido exito o no.
                          */
@@ -139,8 +141,8 @@ public class MenuFlorist {
         String option;
         do{
             System.out.println("-------------STOCK LIST MENU---------------");
-            System.out.println("1- INDIVIDUAL LIST");//TODO:canviar el nombre de esto por uno que se entienda?? si se modifica vigilar con los nombres d los metodos
-            System.out.println("2- TOTAL LIST");
+            System.out.println("1- LIST PER ITEM");
+            System.out.println("2- GLOBAL LIST");
             System.out.println("3- EXIT");
 
             option = MainMenu.SC.nextLine();

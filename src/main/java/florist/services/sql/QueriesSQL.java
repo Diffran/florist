@@ -1,11 +1,11 @@
 package florist.services.sql;
 
 public class QueriesSQL {
-    //main menu
-    public static String printFloristSQL = "SELECT * FROM FLORIST";
-    public static String floristExistsSQL = "SELECT * FROM FLORIST WHERE idFLORIST=?";
-    public static String  createNewFloristSQL = "INSERT INTO FLORIST (name) VALUES (?)";
-    public static String deleteFloristSQL = "DELETE FROM FLORIST WHERE idFLORIST=?";
+    public static final String createNewFloristSQL = "INSERT INTO florist (name, total_stock_value) VALUES (?, 0.0)";
+    public static final String printFloristSQL = "SELECT * FROM florist";
+    public static final String floristExistsSQL = "SELECT * FROM florist WHERE id_florist = ?";
+    public static final String deleteFloristSQL = "DELETE FROM florist WHERE id_florist = ?";
 
-
+    // New queries for products
+    public static final String addProductSQL = "INSERT INTO product (price, name, type, color, height, material_type, quantity) VALUES (?, ?, ?, ?, ?, ?, ?)";
 }
