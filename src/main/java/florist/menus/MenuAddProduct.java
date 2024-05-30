@@ -32,7 +32,7 @@ public class MenuAddProduct {
                         connectionSQL.addDecoration();
                         break;
                     case 4:
-                        exit = true;
+                        MainMenu.mainMenu();
                         //TODO: cuidado! termina el programa
                         break;
                     default:

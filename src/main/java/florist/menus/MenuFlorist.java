@@ -122,6 +122,8 @@ public class MenuFlorist {
             ConnectionSQL connectionSQL = ConnectionSQL.getInstance();
             connectionSQL.connect();
 
+            //TODO: add metode que llisti todos los productos del stock general, para que no te tengas que saber el ID de memoria del producto
+
             // Prompt for product details and add to stock
             System.out.println("Enter product ID to add: ");
             int productId = Integer.parseInt(MainMenu.SC.nextLine());

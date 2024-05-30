@@ -11,7 +11,7 @@ public class ConnectionSQL {
 
     private static final String URL = "jdbc:mysql://localhost:3306/florist";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "";
+    private static final String PASSWORD = "Tysoncete24!";
     private static PreparedStatement stmt;
     private static Statement st;
     private static ResultSet res;
