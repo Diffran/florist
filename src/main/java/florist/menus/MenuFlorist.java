@@ -1,5 +1,7 @@
 package florist.menus;
 
+import florist.services.sql.ConnectionSQL;
+
 public class MenuFlorist {
     private static String optionFlorist;
     private static String optionTicket;
@@ -78,8 +80,8 @@ public class MenuFlorist {
         }while(!optionTicket.equals("3"));
     }
     //-------------------------------------------MENU STOCK-------------------------------------
-    private static void stockMenu(){
-        do{
+    private static void stockMenu() {
+        do {
             System.out.println("-----------STOCK MENU--------------");
             System.out.println("1- ADD PRODUCT");
             System.out.println("2- DELETE PRODUCT");
@@ -91,35 +93,13 @@ public class MenuFlorist {
             try {
                 switch (optionStock) {
                     case "1":
-                        System.out.println("add product");//borrar
-
-                        /*
-                        TODO:8- printMainStockList() -> MenuFlorist-TODO:11
-                         */
-
-
-                        /*TODO:9- addProdutToStock(int floristID) -> connectar con la BD buscar el
-                            stock correspondiente al floristID i sumarle a quantity del producto la cantidad agregada.imprime por pantalla
-                            si ha tenido exito o no.
-                         */
+                        addProductToStock();
                         break;
                     case "2":
-                        System.out.println("delete product");//borrar
-                        /*
-                        TODO:8- printIndividualStockList(int floristID) -> MenuFlorist-TODO:11
-                            pedir el ID i la cantidad
-                            a eliminar.
-                            deleteStockProduct(int floristID, int productID, int quantity) -> metodo que busca en el stock de la florist
-                            i elimina el producto, si no existe lanza una SQLException -> creo, comprovar. imprime por pantalla si ha tenido
-                            exito o no.
-                         */
+                        deleteProductFromStock();
                         break;
                     case "3":
-                        System.out.println("precio total del stock");//borrar
-                        /*
-                        TODO:10- getTotalValue(int floristID) -> connecta con la BD i es una sum del valor de todos los products
-                            del stock del floristID i los multiplica por la cantidad que tiene en stock de cada uno de ellos.
-                         */
+                        getTotalStockPrice();
                         break;
                     case "4":
                         stockListMenu();
@@ -131,15 +111,65 @@ public class MenuFlorist {
                         System.out.println("Invalid option. Please try again.");
                         break;
                 }
-            } catch (Exception e) {//TODO: mirar todas las excepitons...
-                System.out.println("sha de canvia lexception");//borrar
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
             }
-        }while(!optionFlorist.equals("4"));
+        } while (!optionStock.equals("5"));
     }
 
-    public static void stockListMenu(){
+    private static void addProductToStock() {
+        try {
+            ConnectionSQL connectionSQL = ConnectionSQL.getInstance();
+            connectionSQL.connect();
+
+            // Prompt for product details and add to stock
+            System.out.println("Enter product ID to add: ");
+            int productId = Integer.parseInt(MainMenu.SC.nextLine());
+            System.out.println("Enter quantity to add: ");
+            int quantity = Integer.parseInt(MainMenu.SC.nextLine());
+
+            connectionSQL.addProductToStock(floristID, productId, quantity);
+            connectionSQL.disconnect();
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    private static void deleteProductFromStock() {
+        try {
+            ConnectionSQL connectionSQL = ConnectionSQL.getInstance();
+            connectionSQL.connect();
+
+            // Prompt for product details and delete from stock
+            System.out.println("Enter product ID to delete: ");
+            int productId = Integer.parseInt(MainMenu.SC.nextLine());
+            System.out.println("Enter quantity to delete: ");
+            int quantity = Integer.parseInt(MainMenu.SC.nextLine());
+
+            connectionSQL.deleteProductFromStock(floristID, productId, quantity);
+            connectionSQL.disconnect();
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    private static void getTotalStockPrice() {
+        try {
+            ConnectionSQL connectionSQL = ConnectionSQL.getInstance();
+            connectionSQL.connect();
+
+            double totalStockPrice = connectionSQL.getTotalStockValue(floristID);
+            System.out.println("Total stock price: " + totalStockPrice);
+
+            connectionSQL.disconnect();
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    public static void stockListMenu() {
         String option;
-        do{
+        do {
             System.out.println("-------------STOCK LIST MENU---------------");
             System.out.println("1- LIST PER ITEM");
             System.out.println("2- GLOBAL LIST");
@@ -149,18 +179,10 @@ public class MenuFlorist {
             try {
                 switch (option) {
                     case "1":
-                        System.out.println("llama a un metodo que imprime la individual list");//borrar
-                        /*
-                        TODO:11- printIndividualStockList(int floristID) lista todos los productos en stock de la florist ocn
-                            el id. ESTE METODO PUEDE QUE ESTE COMO TODO DE OTRAS CLASSES, MIRAR-LO
-                         */
+                        printIndividualStockList();
                         break;
                     case "2":
-                        System.out.println("llama a un metodo que imprime la total list");//borrar
-                        /*
-                        TODO:11- printTotalStockList(int floristID) lista todos los productos en stock de la florist ocn
-                            el id. ESTE METODO PUEDE QUE ESTE COMO TODO DE OTRAS CLASSES, MIRAR-LO
-                        */
+                        printGlobalStockList();
                         break;
                     case "3":
                         stockMenu();
@@ -170,8 +192,34 @@ public class MenuFlorist {
                         break;
                 }
             } catch (Exception e) {
-                System.out.println("sha de canvia lexception");//borrar
+                System.out.println("Error: " + e.getMessage());
             }
-        }while(!option.equals("3"));
+        } while (!option.equals("3"));
+    }
+
+    private static void printIndividualStockList() {
+        try {
+            ConnectionSQL connectionSQL = ConnectionSQL.getInstance();
+            connectionSQL.connect();
+
+            connectionSQL.printIndividualStockList(floristID);
+
+            connectionSQL.disconnect();
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    private static void printGlobalStockList() {
+        try {
+            ConnectionSQL connectionSQL = ConnectionSQL.getInstance();
+            connectionSQL.connect();
+
+            connectionSQL.printGlobalStockList(floristID);
+
+            connectionSQL.disconnect();
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 }

@@ -10,7 +10,7 @@ public class ConnectionSQL {
 
     private static final String URL = "jdbc:mysql://localhost:3306/florist";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "";
+    private static final String PASSWORD = "sugoalpomodoro";
     private static PreparedStatement stmt;
     private static Statement st;
     private static ResultSet res;
@@ -231,6 +231,161 @@ public class ConnectionSQL {
             disconnect();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }
+    }
+
+    // Add Stock
+    public void createStock() {
+        try {
+            stmt = getConnection().prepareStatement(QueriesSQL.createNewStockSQL);
+            System.out.println("Enter Florist ID for the stock: ");
+            int floristId = Integer.parseInt(MainMenu.SC.nextLine());
+
+            stmt.setInt(1, floristId);
+            stmt.executeUpdate();
+            System.out.println("Stock added for Florist ID: " + floristId);
+
+            disconnect();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    // List All Stocks
+    public void listAllStocks() {
+        try {
+            st = getConnection().createStatement();
+            res = st.executeQuery(QueriesSQL.listAllStocksSQL);
+
+            while (res.next()) {
+                int idStock = res.getInt("id_stock");
+                int floristId = res.getInt("florist_id_florist");
+                System.out.println("Stock ID: " + idStock + ", Florist ID: " + floristId);
+            }
+
+            disconnect();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    // Update Stock
+    public void updateStock() {
+        try {
+            stmt = getConnection().prepareStatement(QueriesSQL.updateStockSQL);
+            System.out.println("Enter Stock ID to update: ");
+            int stockId = Integer.parseInt(MainMenu.SC.nextLine());
+
+            System.out.println("Enter new Florist ID for the stock: ");
+            int newFloristId = Integer.parseInt(MainMenu.SC.nextLine());
+
+            stmt.setInt(1, newFloristId);
+            stmt.setInt(2, stockId);
+            stmt.executeUpdate();
+            System.out.println("Stock ID: " + stockId + " updated with new Florist ID: " + newFloristId);
+
+            disconnect();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    // Delete Stock
+    public void deleteStock() {
+        try {
+            stmt = getConnection().prepareStatement(QueriesSQL.deleteStockSQL);
+            System.out.println("Enter Stock ID to delete: ");
+            int stockId = Integer.parseInt(MainMenu.SC.nextLine());
+
+            stmt.setInt(1, stockId);
+            stmt.executeUpdate();
+            System.out.println("Stock ID: " + stockId + " deleted");
+
+            disconnect();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    // Methods for managing stock
+    public void addProductToStock(int floristId, int productId, int quantity) throws SQLException {
+        String query = "INSERT INTO stock_has_product (quantity, stock_id_stock, product_id_product) " +
+                "VALUES (?, (SELECT id_stock FROM stock WHERE florist_id_florist = ?), ?) " +
+                "ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)";
+
+        stmt = getConnection().prepareStatement(query);
+        stmt.setInt(1, quantity);
+        stmt.setInt(2, floristId);
+        stmt.setInt(3, productId);
+        stmt.executeUpdate();
+        System.out.println("Product added to stock successfully.");
+    }
+
+    public void deleteProductFromStock(int floristId, int productId, int quantity) throws SQLException {
+        String query = "UPDATE stock_has_product SET quantity = quantity - ? " +
+                "WHERE stock_id_stock = (SELECT id_stock FROM stock WHERE florist_id_florist = ?) AND product_id_product = ?";
+
+        stmt = getConnection().prepareStatement(query);
+        stmt.setInt(1, quantity);
+        stmt.setInt(2, floristId);
+        stmt.setInt(3, productId);
+        int rowsUpdated = stmt.executeUpdate();
+
+        if (rowsUpdated > 0) {
+            System.out.println("Product quantity updated successfully.");
+        } else {
+            System.out.println("Product not found in stock or insufficient quantity.");
+        }
+    }
+
+    public double getTotalStockValue(int floristId) throws SQLException {
+        String query = "SELECT SUM(p.price * shp.quantity) AS total_value " +
+                "FROM product p " +
+                "JOIN stock_has_product shp ON p.id_product = shp.product_id_product " +
+                "JOIN stock s ON shp.stock_id_stock = s.id_stock " +
+                "WHERE s.florist_id_florist = ?";
+
+        stmt = getConnection().prepareStatement(query);
+        stmt.setInt(1, floristId);
+        res = stmt.executeQuery();
+
+        if (res.next()) {
+            return res.getDouble("total_value");
+        } else {
+            return 0.0;
+        }
+    }
+
+    public void printIndividualStockList(int floristId) throws SQLException {
+        String query = "SELECT p.name, shp.quantity " +
+                "FROM product p " +
+                "JOIN stock_has_product shp ON p.id_product = shp.product_id_product " +
+                "JOIN stock s ON shp.stock_id_stock = s.id_stock " +
+                "WHERE s.florist_id_florist = ?";
+
+        stmt = getConnection().prepareStatement(query);
+        stmt.setInt(1, floristId);
+        res = stmt.executeQuery();
+
+        while (res.next()) {
+            System.out.println("Product: " + res.getString("name") + ", Quantity: " + res.getInt("quantity"));
+        }
+    }
+
+    public void printGlobalStockList(int floristId) throws SQLException {
+        String query = "SELECT p.name, SUM(shp.quantity) AS total_quantity " +
+                "FROM product p " +
+                "JOIN stock_has_product shp ON p.id_product = shp.product_id_product " +
+                "JOIN stock s ON shp.stock_id_stock = s.id_stock " +
+                "WHERE s.florist_id_florist = ? " +
+                "GROUP BY p.name";
+
+        stmt = getConnection().prepareStatement(query);
+        stmt.setInt(1, floristId);
+        res = stmt.executeQuery();
+
+        while (res.next()) {
+            System.out.println("Product: " + res.getString("name") + ", Total Quantity: " + res.getInt("total_quantity"));
         }
     }
 

@@ -8,4 +8,11 @@ public class QueriesSQL {
 
     // New queries for products
     public static final String addProductSQL = "INSERT INTO product (price, name, type, color, height, material_type, quantity) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+    // New queries for stock
+    public static final String createNewStockSQL = "INSERT INTO stock (florist_id_florist) VALUES (?)";
+    public static final String listAllStocksSQL = "SELECT * FROM stock";
+    public static final String updateStockSQL = "UPDATE stock SET florist_id_florist = ? WHERE id_stock = ?";
+    public static final String deleteStockSQL = "DELETE FROM stock WHERE id_stock = ?";
+
 }
