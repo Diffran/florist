@@ -1,4 +1,5 @@
 package florist.services.sql;
+
 import florist.exceptions.EmptySQLTableException;
 import florist.exceptions.EmptyStringException;
 import florist.menus.MainMenu;
@@ -10,7 +11,7 @@ public class ConnectionSQL {
 
     private static final String URL = "jdbc:mysql://localhost:3306/florist";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "sugoalpomodoro";
+    private static final String PASSWORD = "";
     private static PreparedStatement stmt;
     private static Statement st;
     private static ResultSet res;
@@ -60,67 +61,67 @@ public class ConnectionSQL {
         }
     }
 
-    public void createFlorist() throws EmptyStringException{
+    public void createFlorist() throws EmptyStringException {
 
-        try{
+        try {
             stmt = getConnection().prepareStatement(QueriesSQL.createNewFloristSQL);
 
             System.out.println("Enter Florist name: ");
-            userData=MainMenu.SC.nextLine();
+            userData = MainMenu.SC.nextLine();
 
-            if(!userData.isEmpty()){
+            if (!userData.isEmpty()) {
                 stmt.setString(1, userData);
                 stmt.executeUpdate();
-                System.out.println("florist: "+userData+ " added to the database");
-            }else{
+                System.out.println("florist: " + userData + " added to the database");
+            } else {
                 throw new EmptyStringException("at create Florist");
             }
 
             disconnect();
-        }catch(SQLException e){
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    public void printFlorist() throws EmptySQLTableException{
-        try{
+    public void printFlorist() throws EmptySQLTableException {
+        try {
             getConnection();
             st = connection.createStatement();
             res = st.executeQuery(QueriesSQL.printFloristSQL);
 
             while (res.next()) {
-                System.out.println("ID: " + res.getInt("idFLORIST") + " -NAME: " + res.getString("name"));
+                System.out.println("ID: " + res.getInt("id_florist") + " -NAME: " + res.getString("name"));
             }
 
             disconnect();
 
-        }catch(SQLException e){
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    public boolean floristExist(int id)throws EmptySQLTableException, SQLException{
+    public boolean floristExist(int id) throws EmptySQLTableException, SQLException {
 
         stmt = getConnection().prepareStatement(QueriesSQL.floristExistsSQL);
-        stmt.setInt(1,id);
-        res=stmt.executeQuery();
+        stmt.setInt(1, id);
+        res = stmt.executeQuery();
 
-        if(res.next()){
+        if (res.next()) {
             disconnect();
             return true;
-        }else {
-            throw new EmptySQLTableException("florist with id: "+id);
+        } else {
+            throw new EmptySQLTableException("florist with id: " + id);
         }
     }
 
-    public void deleteFlorist() throws NumberFormatException  {
+    public void deleteFlorist() throws NumberFormatException {
         int id;
         System.out.println("Please enter the ID of the florist you'd like to remove:");
-        userData= MainMenu.SC.nextLine();
-        id= Integer.parseInt(userData);
+        userData = MainMenu.SC.nextLine();
+        id = Integer.parseInt(userData);
 
-        try{
-            if(floristExist(id)) {
+        try {
+            if (floristExist(id)) {
                 stmt = getConnection().prepareStatement(QueriesSQL.deleteFloristSQL);
                 stmt.setInt(1, id);
                 stmt.executeUpdate();
@@ -128,7 +129,7 @@ public class ConnectionSQL {
 
                 disconnect();
             }
-        }catch(SQLException |EmptySQLTableException e){
+        } catch (SQLException | EmptySQLTableException e) {
             System.out.println(e.getMessage());
         }
 
@@ -309,9 +310,7 @@ public class ConnectionSQL {
 
     // Methods for managing stock
     public void addProductToStock(int floristId, int productId, int quantity) throws SQLException {
-        String query = "INSERT INTO stock_has_product (quantity, stock_id_stock, product_id_product) " +
-                "VALUES (?, (SELECT id_stock FROM stock WHERE florist_id_florist = ?), ?) " +
-                "ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)";
+        String query = QueriesSQL.addProductToStock;
 
         stmt = getConnection().prepareStatement(query);
         stmt.setInt(1, quantity);
@@ -322,8 +321,7 @@ public class ConnectionSQL {
     }
 
     public void deleteProductFromStock(int floristId, int productId, int quantity) throws SQLException {
-        String query = "UPDATE stock_has_product SET quantity = quantity - ? " +
-                "WHERE stock_id_stock = (SELECT id_stock FROM stock WHERE florist_id_florist = ?) AND product_id_product = ?";
+        String query = QueriesSQL.deleteProductFromStock;
 
         stmt = getConnection().prepareStatement(query);
         stmt.setInt(1, quantity);
@@ -339,11 +337,7 @@ public class ConnectionSQL {
     }
 
     public double getTotalStockValue(int floristId) throws SQLException {
-        String query = "SELECT SUM(p.price * shp.quantity) AS total_value " +
-                "FROM product p " +
-                "JOIN stock_has_product shp ON p.id_product = shp.product_id_product " +
-                "JOIN stock s ON shp.stock_id_stock = s.id_stock " +
-                "WHERE s.florist_id_florist = ?";
+        String query = QueriesSQL.getTotalStockValue;
 
         stmt = getConnection().prepareStatement(query);
         stmt.setInt(1, floristId);
@@ -357,35 +351,35 @@ public class ConnectionSQL {
     }
 
     public void printIndividualStockList(int floristId) throws SQLException {
-        String query = "SELECT p.name, shp.quantity " +
-                "FROM product p " +
-                "JOIN stock_has_product shp ON p.id_product = shp.product_id_product " +
-                "JOIN stock s ON shp.stock_id_stock = s.id_stock " +
-                "WHERE s.florist_id_florist = ?";
+        String query = QueriesSQL.printIndividualStockList;
 
         stmt = getConnection().prepareStatement(query);
         stmt.setInt(1, floristId);
         res = stmt.executeQuery();
 
         while (res.next()) {
-            System.out.println("Product: " + res.getString("name") + ", Quantity: " + res.getInt("quantity"));
+            System.out.println(
+                    "Product: " + res.getString("name") +
+                            (res.getString("height") == null ? "" : " - Height: " + res.getString("height")) +
+                            (res.getString("color") == null ? "" : " - Color: " + res.getString("color")) +
+                            (res.getString("material_type") == null ? "" : " - Material type: " + res.getString("material_type")) +
+                            " - Quantity: " + res.getInt("quantity") +
+                            " - Unit Price: " + res.getDouble("price") + "€" + "\n"
+            );
         }
     }
 
     public void printGlobalStockList(int floristId) throws SQLException {
-        String query = "SELECT p.name, SUM(shp.quantity) AS total_quantity " +
-                "FROM product p " +
-                "JOIN stock_has_product shp ON p.id_product = shp.product_id_product " +
-                "JOIN stock s ON shp.stock_id_stock = s.id_stock " +
-                "WHERE s.florist_id_florist = ? " +
-                "GROUP BY p.name";
+        String query = QueriesSQL.printGlobalStockList;
 
         stmt = getConnection().prepareStatement(query);
         stmt.setInt(1, floristId);
         res = stmt.executeQuery();
 
         while (res.next()) {
-            System.out.println("Product: " + res.getString("name") + ", Total Quantity: " + res.getInt("total_quantity"));
+            System.out.println("Product: " + res.getString("name") +
+                    ", Total Quantity: " + res.getInt("total_quantity") +
+                    ", Total Price: " + res.getDouble("total_price") + "€");
         }
     }
 
