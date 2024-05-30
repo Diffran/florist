@@ -2,17 +2,11 @@ package florist.models;
 
 import java.util.Date;
 
-@Entity
-@Table(name = "TICKET")
 public class Ticket {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idTICKET;
 
     private Date date;
 
-    @ManyToOne
-    @JoinColumn(name = "idFLORIST", nullable = false)
     private Florist florist;
 
     public int getIdTICKET() {
