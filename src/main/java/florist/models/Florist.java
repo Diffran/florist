@@ -29,4 +29,7 @@ public class Florist {
     public void setValorTotal(double valorTotal) {
         this.valorTotal = valorTotal;
     }
+
+    public void setId(int floristID) {
+    }
 }

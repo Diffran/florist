@@ -22,7 +22,7 @@ public class QueriesSQL {
             "WHERE s.florist_id_florist = ? " +
             "GROUP BY p.name, p.price";
 
-    public static final String printIndividualStockList = "SELECT p.name, p.price, p.color, p.height, p.material_type, shp.quantity " +
+    public static final String printIndividualStockList = "SELECT p.id_product, p.name, p.price, p.color, p.height, p.material_type, shp.quantity " +
             "FROM product p " +
             "JOIN stock_has_product shp ON p.id_product = shp.product_id_product " +
             "JOIN stock s ON shp.stock_id_stock = s.id_stock " +

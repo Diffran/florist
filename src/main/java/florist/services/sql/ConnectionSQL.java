@@ -12,10 +12,10 @@ public class ConnectionSQL {
 
     private static final String URL = "jdbc:mysql://localhost:3306/florist";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "Tysoncete24!";
-    private static PreparedStatement stmt;
+    private static final String PASSWORD = "sugoalpomodoro";
+    public static PreparedStatement stmt;
     private static Statement st;
-    private static ResultSet res;
+    public static ResultSet res;
     private static String userData;
 
     private ConnectionSQL() {
@@ -360,7 +360,8 @@ public class ConnectionSQL {
 
         while (res.next()) {
             System.out.println(
-                    "Product: " + res.getString("name") +
+                    "Product ID: " + res.getInt("id_product") +
+                            " - Product: " + res.getString("name") +
                             (res.getString("height") == null ? "" : " - Height: " + res.getString("height")) +
                             (res.getString("color") == null ? "" : " - Color: " + res.getString("color")) +
                             (res.getString("material_type") == null ? "" : " - Material type: " + res.getString("material_type")) +
