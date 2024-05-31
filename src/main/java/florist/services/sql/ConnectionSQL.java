@@ -379,9 +379,13 @@ public class ConnectionSQL {
         res = stmt.executeQuery();
 
         while (res.next()) {
-            System.out.println("Product: " + res.getString("name") +
-                    ", Total Quantity: " + res.getInt("total_quantity") +
-                    ", Total Price: " + res.getDouble("total_price") + "€");
+            System.out.println(
+                    "Product ID: " + res.getInt("id_product") +
+                            " - Product: " + res.getString("name") +
+                            " - Total Quantity: " + res.getInt("total_quantity") +
+                            " - Total Price: " + res.getDouble("total_price") +
+                            "€"
+            );
         }
     }
 
@@ -483,6 +487,28 @@ public class ConnectionSQL {
         return totalPrice;
     }
 
+    public int countTickets() throws SQLException {
+        int count = 0;
 
+        try {
+            connect();
+
+            String query = QueriesSQL.countTickets;
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+
+            if (rs.next()) {
+                count = rs.getInt("total");
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error counting tickets: " + e.getMessage());
+
+        } finally {
+            disconnect();
+        }
+
+        return count;
+    }
 
 }

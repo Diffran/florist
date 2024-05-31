@@ -2,6 +2,7 @@ package florist.models;
 
 import florist.models.Florist;
 import florist.services.sql.ConnectionSQL;
+import florist.services.sql.QueriesSQL;
 
 import java.sql.SQLException;
 import java.util.Date;
@@ -61,7 +62,7 @@ public class Ticket {
             int productId = entry.getKey();
             int quantity = entry.getValue();
 
-            String query = "SELECT price FROM product WHERE id_product = ?";
+            String query = QueriesSQL.calculateTotalPrice;
             stmt = ConnectionSQL.getInstance().getConnection().prepareStatement(query);
             stmt.setInt(1, productId);
             res = stmt.executeQuery();

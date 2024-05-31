@@ -5,26 +5,26 @@ import florist.models.Florist;
 import florist.models.Ticket;
 import florist.services.sql.ConnectionSQL;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
 public class NewTicketMenu {
-    private static String ticketOption;
     private static int floristID;
-    private static int productID;
-    private static int quantity;
     private static String userData;
-    private static HashMap<Integer, Integer> productList = new HashMap<>(); // key=productID and value=quantity
+    private static final HashMap<Integer, Integer> PRODUCT_LIST = new HashMap<>(); // key=productID and value=quantity
 
     public static void newTicketMenu(int floristId) {
         floristID = floristId; // This should be okay.
+        String ticketOption;
         do {
             System.out.println("-----------NEW TICKET--------------");
             System.out.println("1- ADD PRODUCT");
-            System.out.println("2- LIST");
+            System.out.println("2- LIST ONGOING TICKET");
             System.out.println("3- COMPLETED");
             System.out.println("4- EXIT");
 
@@ -35,14 +35,14 @@ public class NewTicketMenu {
                         ConnectionSQL.getInstance().printIndividualStockList(floristID);
                         System.out.println("Enter product ID: ");
                         userData = MainMenu.SC.nextLine();
-                        productID = Integer.parseInt(userData);
+                        int productID = Integer.parseInt(userData);
 
                         System.out.println("Enter product quantity: ");
                         userData = MainMenu.SC.nextLine();
-                        quantity = Integer.parseInt(userData);
+                        int quantity = Integer.parseInt(userData);
 
                         if (ConnectionSQL.getInstance().isThereProduct(floristID, productID, quantity)) {
-                            productList.put(productID, quantity);
+                            PRODUCT_LIST.put(productID, quantity);
                             System.out.println("Product added to ticket.");
                         } else {
                             System.out.println("Insufficient stock.");
@@ -52,7 +52,7 @@ public class NewTicketMenu {
                         listTicketProducts();
                         break;
                     case "3":
-                        completeTicket(floristID, productList);
+                        completeTicket(floristID, PRODUCT_LIST);
                         if (printTicketMenu()) {
                             System.out.println("Printed ticket in JSON");
                         }
@@ -76,7 +76,7 @@ public class NewTicketMenu {
         userData = MainMenu.SC.nextLine();
         if (userData.equals("yes")) {
             try {
-                printTicket(floristID, productList);
+                printTicket(floristID);
                 return true;
             } catch (IOException | SQLException e) {
                 System.out.println("Error printing ticket: " + e.getMessage());
@@ -87,26 +87,36 @@ public class NewTicketMenu {
         }
     }
 
-    private static void printTicket(int floristID, HashMap<Integer, Integer> productList) throws IOException, SQLException {
+    private static void printTicket(int floristID) throws IOException, SQLException {
         Ticket ticket = new Ticket();
         ticket.setIdTICKET(generateTicketId()); // Implement generateTicketId() to generate a unique ticket ID
         ticket.setDate(new Date());
         ticket.setFlorist(getFlorist(floristID)); // Implement getFlorist() to retrieve the Florist object
-        ticket.setProductList(productList);
+        ticket.setProductList(NewTicketMenu.PRODUCT_LIST);
 
         Gson gson = new Gson();
         String json = gson.toJson(ticket);
 
+        // Get the current date
+        SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy");
+        String dateFolderName = dateFormat.format(new Date());
+
+        // Create directories if they don't exist
+        File directory = new File("tickets/" + dateFolderName);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
         // Save the JSON string to a file
-        try (FileWriter writer = new FileWriter("ticket_" + ticket.getIdTICKET() + ".json")) {
+        try (FileWriter writer = new FileWriter(directory + "/ticket_" + ticket.getIdTICKET() + ".json")) {
             writer.write(json);
         }
+
+        System.out.println("Ticket saved to: " + directory + "/ticket_" + ticket.getIdTICKET() + ".json");
     }
 
-    private static int generateTicketId() {
-        // Implement logic to generate a unique ticket ID, e.g., by querying the database
-        // For simplicity, return a random number here
-        return (int) (Math.random() * 100000);
+    private static int generateTicketId() throws SQLException {
+        return ConnectionSQL.getInstance().countTickets() + 1;
     }
 
     private static Florist getFlorist(int floristID) throws SQLException {
@@ -114,13 +124,13 @@ public class NewTicketMenu {
         // For simplicity, return a dummy Florist object here
         Florist florist = new Florist();
         florist.setId(floristID);
-        florist.setName("Florist Name");
+        florist.setName(florist.getName());
         return florist;
     }
 
     private static void listTicketProducts() {
         System.out.println("Products in the ticket:");
-        for (HashMap.Entry<Integer, Integer> entry : productList.entrySet()) {
+        for (HashMap.Entry<Integer, Integer> entry : PRODUCT_LIST.entrySet()) {
             int productId = entry.getKey();
             int quantity = entry.getValue();
             try {
