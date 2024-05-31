@@ -40,4 +40,19 @@ public class QueriesSQL {
     public static final String addProductToStock = "INSERT INTO stock_has_product (quantity, stock_id_stock, product_id_product) " +
             "VALUES (?, (SELECT id_stock FROM stock WHERE florist_id_florist = ?), ?) " +
             "ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)";
+
+    // Ticket queries
+    public static final String insertTicket = "INSERT INTO ticket (total_price, florist_id_florist) VALUES (?, ?)";
+    public static final String insertProductTicket = "INSERT INTO product_has_ticket (quantity, ticket_id_ticket, product_id_product) VALUES (?, ?, ?)";
+    public static final String updateStock = "UPDATE stock_has_product shp " +
+            "JOIN stock s ON shp.stock_id_stock = s.id_stock " +
+            "SET shp.quantity = shp.quantity - ? " +
+            "WHERE s.florist_id_florist = ? AND shp.product_id_product = ?";
+    public static final String doWeHaveProduct = "SELECT shp.quantity " +
+            "FROM stock_has_product shp " +
+            "JOIN stock s ON shp.stock_id_stock = s.id_stock " +
+            "WHERE s.florist_id_florist = ? AND shp.product_id_product = ?";
+    public static final String getProdName = "SELECT name FROM product WHERE id_product = ?";
+    public static final String calcTotPrice = "SELECT price FROM product WHERE id_product = ?";
 }
+
