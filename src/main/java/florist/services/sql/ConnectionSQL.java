@@ -5,6 +5,7 @@ import florist.exceptions.EmptyStringException;
 import florist.menus.MainMenu;
 
 import java.sql.*;
+import java.util.HashMap;
 
 public class ConnectionSQL {
     private Connection connection;
@@ -12,9 +13,9 @@ public class ConnectionSQL {
     private static final String URL = "jdbc:mysql://localhost:3306/florist";
     private static final String USERNAME = "root";
     private static final String PASSWORD = "";
-    private static PreparedStatement stmt;
+    public static PreparedStatement stmt;
     private static Statement st;
-    private static ResultSet res;
+    public static ResultSet res;
     private static String userData;
 
     private ConnectionSQL() {
@@ -359,7 +360,8 @@ public class ConnectionSQL {
 
         while (res.next()) {
             System.out.println(
-                    "Product: " + res.getString("name") +
+                    "Product ID: " + res.getInt("id_product") +
+                            " - Product: " + res.getString("name") +
                             (res.getString("height") == null ? "" : " - Height: " + res.getString("height")) +
                             (res.getString("color") == null ? "" : " - Color: " + res.getString("color")) +
                             (res.getString("material_type") == null ? "" : " - Material type: " + res.getString("material_type")) +
@@ -377,10 +379,136 @@ public class ConnectionSQL {
         res = stmt.executeQuery();
 
         while (res.next()) {
-            System.out.println("Product: " + res.getString("name") +
-                    ", Total Quantity: " + res.getInt("total_quantity") +
-                    ", Total Price: " + res.getDouble("total_price") + "€");
+            System.out.println(
+                    "Product ID: " + res.getInt("id_product") +
+                            " - Product: " + res.getString("name") +
+                            " - Total Quantity: " + res.getInt("total_quantity") +
+                            " - Total Price: " + res.getDouble("total_price") +
+                            "€"
+            );
         }
+    }
+
+    // ticket
+    public boolean isThereProduct(int floristId, int productId, int quantity) throws SQLException {
+        String doWeHaveProduct = QueriesSQL.doWeHaveProduct;
+        stmt = getConnection().prepareStatement(doWeHaveProduct);
+        stmt.setInt(1, floristId);
+        stmt.setInt(2, productId);
+        res = stmt.executeQuery();
+
+        if (res.next()) {
+            int availableQuantity = res.getInt("quantity");
+            return availableQuantity >= quantity;
+        } else {
+            return false;
+        }
+    }
+
+    public String getProductName(int productId) throws SQLException {
+        String getProdName = QueriesSQL.getProdName;
+        stmt = getConnection().prepareStatement(getProdName);
+        stmt.setInt(1, productId);
+        res = stmt.executeQuery();
+
+        if (res.next()) {
+            return res.getString("name");
+        } else {
+            return null;
+        }
+    }
+
+    public void completeTicket(int floristId, HashMap<Integer, Integer> productList) throws SQLException {
+        Connection conn = getConnection();
+        try {
+            conn.setAutoCommit(false);
+
+            // Insert into ticket table
+            String insertTicket = QueriesSQL.insertTicket;
+            double totalPrice = calculateTotalPrice(productList);
+            stmt = conn.prepareStatement(insertTicket, Statement.RETURN_GENERATED_KEYS);
+            stmt.setDouble(1, totalPrice);
+            stmt.setInt(2, floristId);
+            stmt.executeUpdate();
+
+            res = stmt.getGeneratedKeys();
+            int ticketId = 0;
+            if (res.next()) {
+                ticketId = res.getInt(1);
+            }
+
+            // Update stock and insert into product_has_ticket
+            for (HashMap.Entry<Integer, Integer> entry : productList.entrySet()) {
+                int productId = entry.getKey();
+                int quantity = entry.getValue();
+
+                // Update stock
+                String updateStock = QueriesSQL.updateStock;
+                stmt = conn.prepareStatement(updateStock);
+                stmt.setInt(1, quantity);
+                stmt.setInt(2, floristId);
+                stmt.setInt(3, productId);
+                stmt.executeUpdate();
+
+                // Insert into product_has_ticket
+                String insertProductTicket = QueriesSQL.insertProductTicket;
+                stmt = conn.prepareStatement(insertProductTicket);
+                stmt.setInt(1, quantity);
+                stmt.setInt(2, ticketId);
+                stmt.setInt(3, productId);
+                stmt.executeUpdate();
+            }
+
+            conn.commit();
+        } catch (SQLException e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(true);
+        }
+    }
+
+    public double calculateTotalPrice(HashMap<Integer, Integer> productList) throws SQLException {
+        double totalPrice = 0.0;
+        for (HashMap.Entry<Integer, Integer> entry : productList.entrySet()) {
+            int productId = entry.getKey();
+            int quantity = entry.getValue();
+
+            String calcTotPrice = QueriesSQL.calcTotPrice;
+            stmt = getConnection().prepareStatement(calcTotPrice);
+            stmt.setInt(1, productId);
+            res = stmt.executeQuery();
+
+            if (res.next()) {
+                double price = res.getDouble("price");
+                totalPrice += price * quantity;
+            }
+        }
+        return totalPrice;
+    }
+
+    public int countTickets() throws SQLException {
+        int count = 0;
+
+        try {
+            connect();
+
+            String query = QueriesSQL.countTickets;
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+
+            if (rs.next()) {
+                count = rs.getInt("total");
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error counting tickets: " + e.getMessage());
+
+        } finally {
+            disconnect();
+        }
+
+        return count;
     }
 
 }

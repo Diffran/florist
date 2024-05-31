@@ -1,23 +1,30 @@
 package florist.menus;
 
+import com.google.gson.Gson;
+import florist.models.Florist;
+import florist.models.Ticket;
+import florist.services.sql.ConnectionSQL;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 public class NewTicketMenu {
-    private static String ticketOption;
     private static int floristID;
-    private static int productID;
-    private static int quantity;
     private static String userData;
-    private static HashMap<Integer,Integer> productList;//key=productID i value=quantity
+    private static final HashMap<Integer, Integer> PRODUCT_LIST = new HashMap<>(); // key=productID and value=quantity
 
-    //TODO:1 -> private Ticket ticket; !!!!!!!!!!!!!!!!!!!!!
-
-    public static void newTicketMenu(int floristId){
-        floristID=floristId;//aixo segurament esta malament, pero no me deja hacer this.
-        do{
+    public static void newTicketMenu(int floristId) {
+        floristID = floristId; // This should be okay.
+        String ticketOption;
+        do {
             System.out.println("-----------NEW TICKET--------------");
             System.out.println("1- ADD PRODUCT");
-            System.out.println("2- LIST");
+            System.out.println("2- LIST ONGOING TICKET");
             System.out.println("3- COMPLETED");
             System.out.println("4- EXIT");
 
@@ -25,40 +32,29 @@ public class NewTicketMenu {
             try {
                 switch (ticketOption) {
                     case "1":
-                        System.out.println("list product to add");//borrar
-                        //TODO:12- printIndividualStockList(int floristID) -> TODO:11
-
+                        ConnectionSQL.getInstance().printIndividualStockList(floristID);
                         System.out.println("Enter product ID: ");
-                        userData=MainMenu.SC.nextLine();
-                        productID=Integer.parseInt(userData);
+                        userData = MainMenu.SC.nextLine();
+                        int productID = Integer.parseInt(userData);
 
                         System.out.println("Enter product quantity: ");
-                        userData=MainMenu.SC.nextLine();
-                        quantity=Integer.parseInt(userData);
+                        userData = MainMenu.SC.nextLine();
+                        int quantity = Integer.parseInt(userData);
 
-                        //TODO:13- isThereProduct(int floristId, int productId,int quantity) return boolean, comprueva si hay producto i la cantidad pedida en el stock de la floristID si no lanza notInStockException
-                        //TODO:14- si hay suficiente agregar el productID i la cantidad al HashMap productList
-                        //TODO:15- crear la exception ->notInStockException
+                        if (ConnectionSQL.getInstance().isThereProduct(floristID, productID, quantity)) {
+                            PRODUCT_LIST.put(productID, quantity);
+                            System.out.println("Product added to ticket.");
+                        } else {
+                            System.out.println("Insufficient stock.");
+                        }
                         break;
                     case "2":
-                        System.out.println("list products in tiquet");//borrar
-                        /*
-                        TODO:16- listTicketProducts() -> listar todos los productos del HashMap -> si se quiere se puede
-                          ir a la connexion i imprimir tambien el nombre del producto o solo el id i la cantidad
-                          depende del tiempo que tengamos - ELS PRODUCTES NO ESTAN ACTUALITZATS ENCARA A LA BD, FALTARA UN NULLPOINTEXCEPTION PER QUAN
-                          LA ITERIS VACIA.
-                         */
+                        listTicketProducts();
                         break;
                     case "3":
-                        System.out.println("completar el producto. Esto modificara la BD");
-                        /*
-                        TODO:17- completeTicket(int idFlorist, hashMap productList) -> metodo que connectará con la BD i
-                         hará las modificaciones correspondientes, tiene que:
-                         + modificar el stock de la jardineria correspondiente
-                         + modificar el valorTotal de la florist, es decir, restar el valor de los productos.
-                         */
-                        if(printTicketMenu()){
-                            System.out.println("printed ticket in JSON");
+                        completeTicket(floristID, PRODUCT_LIST);
+                        if (printTicketMenu()) {
+                            System.out.println("Printed ticket in JSON");
                         }
                         MenuFlorist.ticketMenu();
                         break;
@@ -69,26 +65,89 @@ public class NewTicketMenu {
                         System.out.println("Invalid option. Please try again.");
                         break;
                 }
-            } catch (Exception e) {//TODO: mirar todas las excepitons...
-                System.out.println("sha de canvia lexception");//borrar
-                System.out.println(e.getMessage());
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
             }
-        }while(!ticketOption.equals("4"));
+        } while (!ticketOption.equals("4"));
     }
 
-    private static boolean printTicketMenu(){
-        System.out.println("print ticket? [yes][no]");
-        userData=MainMenu.SC.nextLine();
-        if(userData.equals("yes")){
-            /*
-            TODO:18- printTicket(int floristID, HashMap productList) -> basicamente tiene que crear los objetos ticket i crear
-             un JSON con ellos, aqui es donde deberiamos usar la fabrica i etc...
-             */
-            return true;
-        }else{
+    private static boolean printTicketMenu() {
+        System.out.println("Print ticket? [yes][no]");
+        userData = MainMenu.SC.nextLine();
+        if (userData.equals("yes")) {
+            try {
+                printTicket(floristID);
+                return true;
+            } catch (IOException | SQLException e) {
+                System.out.println("Error printing ticket: " + e.getMessage());
+                return false;
+            }
+        } else {
             return false;
         }
     }
 
+    private static void printTicket(int floristID) throws IOException, SQLException {
+        Ticket ticket = new Ticket();
+        ticket.setIdTICKET(generateTicketId()); // Implement generateTicketId() to generate a unique ticket ID
+        ticket.setDate(new Date());
+        ticket.setFlorist(getFlorist(floristID)); // Implement getFlorist() to retrieve the Florist object
+        ticket.setProductList(NewTicketMenu.PRODUCT_LIST);
 
+        Gson gson = new Gson();
+        String json = gson.toJson(ticket);
+
+        // Get the current date
+        SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy");
+        String dateFolderName = dateFormat.format(new Date());
+
+        // Create directories if they don't exist
+        File directory = new File("tickets/" + dateFolderName);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        // Save the JSON string to a file
+        try (FileWriter writer = new FileWriter(directory + "/ticket_" + ticket.getIdTICKET() + ".json")) {
+            writer.write(json);
+        }
+
+        System.out.println("Ticket saved to: " + directory + "/ticket_" + ticket.getIdTICKET() + ".json");
+    }
+
+    private static int generateTicketId() throws SQLException {
+        return ConnectionSQL.getInstance().countTickets() + 1;
+    }
+
+    private static Florist getFlorist(int floristID) throws SQLException {
+        // Implement logic to retrieve the Florist object from the database using floristID
+        // For simplicity, return a dummy Florist object here
+        Florist florist = new Florist();
+        florist.setId(floristID);
+        florist.setName(florist.getName());
+        return florist;
+    }
+
+    private static void listTicketProducts() {
+        System.out.println("Products in the ticket:");
+        for (HashMap.Entry<Integer, Integer> entry : PRODUCT_LIST.entrySet()) {
+            int productId = entry.getKey();
+            int quantity = entry.getValue();
+            try {
+                String productName = ConnectionSQL.getInstance().getProductName(productId);
+                System.out.println("Product ID: " + productId + ", Name: " + productName + ", Quantity: " + quantity);
+            } catch (SQLException e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+    }
+
+    private static void completeTicket(int floristId, HashMap<Integer, Integer> productList) {
+        try {
+            ConnectionSQL.getInstance().completeTicket(floristId, productList);
+            System.out.println("Ticket completed and stock updated.");
+        } catch (SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
 }
