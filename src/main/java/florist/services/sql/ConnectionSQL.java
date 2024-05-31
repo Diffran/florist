@@ -12,7 +12,7 @@ public class ConnectionSQL {
 
     private static final String URL = "jdbc:mysql://localhost:3306/florist";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "sugoalpomodoro";
+    private static final String PASSWORD = "";
     public static PreparedStatement stmt;
     private static Statement st;
     public static ResultSet res;
