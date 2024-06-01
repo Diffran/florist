@@ -67,10 +67,12 @@ CREATE TABLE IF NOT EXISTS `florist`.`stock_has_product` (
   `quantity` INT NOT NULL,
   `stock_id_stock` INT NOT NULL,
   `product_id_product` INT NOT NULL,
-    FOREIGN KEY (`stock_id_stock`)
+  UNIQUE INDEX `unique_stock_product` (`stock_id_stock`, `product_id_product`),
+  FOREIGN KEY (`stock_id_stock`)
     REFERENCES `florist`.`stock` (`id_stock`),
-    FOREIGN KEY (`product_id_product`)
-    REFERENCES `florist`.`product` (`id_product`));
+  FOREIGN KEY (`product_id_product`)
+    REFERENCES `florist`.`product` (`id_product`)
+);
 
 
 -- -----------------------------------------------------

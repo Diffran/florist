@@ -4,6 +4,9 @@ import static florist.menus.MenuFlorist.menuFlorist;
 import static florist.menus.option.MenuStockOption.*;
 import florist.services.sql.ConnectionSQL;
 
+import java.sql.SQLException;
+import java.util.List;
+
 public class MenuStock {
     public static void stockMenu(int floristID) {
         int optionStock = 0;
@@ -33,12 +36,29 @@ public class MenuStock {
 
     private static void handleMenu() {
         System.out.println("-----------STOCK MENU--------------");
-        System.out.println("1- ADD PRODUCT");
-        System.out.println("2- UPDATE PRODUCT QUANTITY");
-        System.out.println("3- DELETE PRODUCT");
-        System.out.println("4- TOTAL STOCK PRICE");
-        System.out.println("5- LIST STOCK");
+        System.out.println("1- GET PRODUCT FROM MAIN STOCK");
+        System.out.println("2- UPDATE PRODUCT QUANTITY FROM FLORIST");
+        System.out.println("3- DELETE PRODUCT FROM FLORIST");
+        System.out.println("4- TOTAL FLORIST STOCK VALUE");
+        System.out.println("5- LIST FLORIST STOCK");
         System.out.println("6- EXIT");
+    }
+
+    private static void listAllProducts() {
+        try {
+            ConnectionSQL connectionSQL = ConnectionSQL.getInstance();
+            connectionSQL.connect();
+            List<String> products = connectionSQL.listAllProduct();
+
+            System.out.println("All Products:");
+            for (String product : products) {
+                System.out.println(product);
+            }
+
+            connectionSQL.disconnect();
+        } catch (SQLException e) {
+            System.out.println("Error listing products: " + e.getMessage());
+        }
     }
 
     private static void addProductToStock(int floristID) {
@@ -46,6 +66,7 @@ public class MenuStock {
             ConnectionSQL connectionSQL = ConnectionSQL.getInstance();
             connectionSQL.connect();
 
+            listAllProducts();
             System.out.println("Enter product ID to add: ");
             int productId = Integer.parseInt(MainMenu.SC.nextLine());
             System.out.println("Enter quantity to add: ");
@@ -64,6 +85,7 @@ public class MenuStock {
             ConnectionSQL connectionSQL = ConnectionSQL.getInstance();
             connectionSQL.connect();
 
+            printIndividualStockList(floristID);
             System.out.println("Enter product ID: ");
             int productId = Integer.parseInt(MainMenu.SC.nextLine());
             System.out.println("Enter quantity to update: ");

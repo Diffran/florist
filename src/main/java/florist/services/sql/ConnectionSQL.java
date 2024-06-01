@@ -5,14 +5,16 @@ import florist.exceptions.EmptyStringException;
 import florist.menus.MainMenu;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class ConnectionSQL {
     private Connection connection;
 
     private static final String URL = "jdbc:mysql://localhost:3306/florist";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "";
+    private static final String PASSWORD = "sugoalpomodoro";
     public static PreparedStatement stmt;
     private static Statement st;
     public static ResultSet res;
@@ -666,6 +668,31 @@ public class ConnectionSQL {
             }
         }
     }
+    public List<String> listAllProduct() throws SQLException {
+        List<String> products = new ArrayList<>();
+        String query = QueriesSQL.listAllProduct;
 
+        try {
+            stmt = getConnection().prepareStatement(query);
+            res = stmt.executeQuery();
+
+            while (res.next()) {
+                String productDetails = "ID: " + res.getInt("id_product") +
+                        ", Name: " + res.getString("name") +
+                        ", Price: " + res.getDouble("price") +
+                        ", Color: " + res.getString("color") +
+                        (res.getString("height") != null ? ", Height: " + res.getString("height") : "") +
+                        (res.getString("material_type") != null ? ", Material Type: " + res.getString("material_type") : "") +
+                        ", Quantity: " + res.getInt("quantity");
+                products.add(productDetails);
+            }
+        } finally {
+            if (res != null) res.close();
+            if (stmt != null) stmt.close();
+            disconnect();
+        }
+
+        return products;
+    }
 
 }

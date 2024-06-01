@@ -14,6 +14,7 @@ public class QueriesSQL {
     public static final String listAllStocksSQL = "SELECT * FROM stock";
     public static final String updateStockSQL = "UPDATE stock SET florist_id_florist = ? WHERE id_stock = ?";
     public static final String deleteStockSQL = "DELETE FROM stock WHERE id_stock = ?";
+    public static final String listAllProduct = "SELECT * FROM product";
 
     public static final String printGlobalStockList = "SELECT p.id_product, p.name, SUM(p.price * shp.quantity) AS total_price, p.color, p.height, p.material_type, SUM(shp.quantity) AS total_quantity " +
             "FROM product p " +

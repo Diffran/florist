@@ -19,7 +19,7 @@ public class MenuFlorist {
                     case STOCK -> MenuStock.stockMenu(floristID);
                     case TICKET -> MenuTicket.ticketMenu(floristID);
                     case TOTAL_TICKET_SELL -> System.out.println("print totalSell");
-                    case EXIT_FLORIST -> System.out.println("Exiting to main menu...");
+                    case EXIT_FLORIST -> MainMenu.mainMenu();
                     default -> System.out.println("Invalid option. Please try again.");
                 }
             } catch (NumberFormatException e) {
