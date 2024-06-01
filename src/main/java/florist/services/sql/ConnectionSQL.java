@@ -14,7 +14,7 @@ public class ConnectionSQL {
 
     private static final String URL = "jdbc:mysql://localhost:3306/florist";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "sugoalpomodoro";
+    private static final String PASSWORD = "";
     public static PreparedStatement stmt;
     private static Statement st;
     public static ResultSet res;
@@ -59,7 +59,7 @@ public class ConnectionSQL {
                 System.out.println("Disconnected");
 
             } catch (SQLException e) {
-                System.out.println("Error: " + e);
+                System.out.println("Error: " + e.getMessage());
             }
         }
     }
@@ -510,7 +510,6 @@ public class ConnectionSQL {
         }
     }
 
-
     public double calculateTotalPrice(HashMap<Integer, Integer> productList) throws SQLException {
         double totalPrice = 0.0;
 
@@ -518,7 +517,7 @@ public class ConnectionSQL {
             int productId = entry.getKey();
             int quantity = entry.getValue();
 
-            String calcTotPrice = QueriesSQL.calcTotPrice;
+            String calcTotPrice = QueriesSQL.getProductPrice;
             stmt = getConnection().prepareStatement(calcTotPrice);
             stmt.setInt(1, productId);
             res = stmt.executeQuery();
@@ -613,6 +612,14 @@ public class ConnectionSQL {
         stmt.executeUpdate();
     }
 
+    public void addProductBack2(int quantityUpdated, int productId) throws SQLException {
+        String query = QueriesSQL.updateProductByID;
+        try (PreparedStatement pstmt = getConnection().prepareStatement(query)) {
+            pstmt.setInt(1, quantityUpdated);
+            pstmt.setInt(2, productId);
+            pstmt.executeUpdate();
+        }
+    }
 
     public void deleteProductFromFloristStockByID(int floristId, int productId) throws SQLException {
         Connection conn = null;
@@ -668,6 +675,7 @@ public class ConnectionSQL {
             }
         }
     }
+
     public List<String> listAllProduct() throws SQLException {
         List<String> products = new ArrayList<>();
         String query = QueriesSQL.listAllProduct;

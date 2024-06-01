@@ -66,7 +66,7 @@ public class Ticket {
             if (quantityInteger != null) {
                 int quantity = quantityInteger.intValue();
 
-                String query = QueriesSQL.calculateTotalPrice;
+                String query = QueriesSQL.getProductPrice;
                 stmt = ConnectionSQL.getInstance().getConnection().prepareStatement(query);
                 stmt.setInt(1, productId);
                 res = stmt.executeQuery();

@@ -2,8 +2,10 @@ package florist.menus;
 
 import static florist.menus.MenuFlorist.menuFlorist;
 import static florist.menus.option.MenuStockOption.*;
+
 import florist.services.sql.ConnectionSQL;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -62,21 +64,50 @@ public class MenuStock {
     }
 
     private static void addProductToStock(int floristID) {
+        Connection conn = null;
+        ConnectionSQL connectionSQL = ConnectionSQL.getInstance();
+
         try {
-            ConnectionSQL connectionSQL = ConnectionSQL.getInstance();
+
+            conn = connectionSQL.getConnection();
+            conn.setAutoCommit(false);
+
             connectionSQL.connect();
 
             listAllProducts();
+
             System.out.println("Enter product ID to add: ");
             int productId = Integer.parseInt(MainMenu.SC.nextLine());
             System.out.println("Enter quantity to add: ");
             int quantity = Integer.parseInt(MainMenu.SC.nextLine());
 
-            connectionSQL.addProductToStock(floristID, productId, quantity);
-            connectionSQL.disconnect();
+            int quantityProduct = connectionSQL.getProductQuantity(productId);
 
+            int quantityUpdated = quantityProduct - quantity;
+
+            connectionSQL.addProductBack2(quantityUpdated, productId);
+
+            connectionSQL.addProductToStock(floristID, productId, quantity);
+
+            conn.commit(); // Confirmar la transacción
         } catch (Exception e) {
+            try {
+                if (conn != null) {
+                    conn.rollback(); // Revertir la transacción en caso de error
+                }
+            } catch (SQLException ex) {
+                System.out.println("Rollback error: " + ex.getMessage());
+            }
             System.out.println("Error: " + e.getMessage());
+        } finally {
+            try {
+                if (conn != null && !conn.isClosed()) {
+                    conn.setAutoCommit(true);
+                    connectionSQL.disconnect();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
