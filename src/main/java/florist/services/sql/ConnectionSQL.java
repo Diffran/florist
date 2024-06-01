@@ -544,14 +544,51 @@ public class ConnectionSQL {
         }
     }
 
-    public void deleteProductFromFloristStockByID(int idStock, int productId) throws SQLException {
-        String query = QueriesSQL.deleteProductFromFloristStockByID;
-        stmt = getConnection().prepareStatement(query);
-        stmt.setInt(1, idStock);
-        stmt.setInt(2, productId);
 
-        stmt.executeUpdate();
-        System.out.println("Product with ID: " + productId + "has been successfully deleted.");
+    public void deleteProductFromFloristStockByID(int floristId, int productId) throws SQLException {
+        Connection conn = getConnection();
+        PreparedStatement stmt = null;
+
+        try {
+            // Start transaction
+            conn.setAutoCommit(false);
+
+            // Step 1: Delete the product from the stock_has_product table
+            String deleteQuery = QueriesSQL.deleteProductFromFloristStockByID;
+            stmt = conn.prepareStatement(deleteQuery);
+            stmt.setInt(1, floristId);
+            stmt.setInt(2, productId);
+            int rowsDeleted = stmt.executeUpdate();
+
+            if (rowsDeleted > 0) {
+                System.out.println("Product with ID: " + productId + " has been successfully deleted from florist stock.");
+
+                // Step 2: Add the product back to the product table
+                String addBackQuery = QueriesSQL.updateProductByID;
+                stmt = conn.prepareStatement(addBackQuery);
+                stmt.setInt(1, productId);
+                stmt.executeUpdate();
+
+                conn.commit(); // Commit the transaction
+                System.out.println("Product added back to the product table.");
+            } else {
+                System.out.println("Product not found in florist stock.");
+                conn.rollback(); // Rollback the transaction on failure
+            }
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback(); // Rollback the transaction on error
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            throw e;
+        } finally {
+            if (stmt != null) stmt.close();
+            conn.setAutoCommit(true);
+        }
     }
+
 
 }

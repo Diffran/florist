@@ -41,6 +41,10 @@ public class QueriesSQL {
 
     public static final String updateProductByID = "UPDATE product SET quantity = ? WHERE id_product = ?";
 
+
+
+
+
     public static final String addProductToStock = "INSERT INTO stock_has_product (quantity, stock_id_stock, product_id_product) " +
             "VALUES (?, (SELECT id_stock FROM stock WHERE florist_id_florist = ?), ?) " +
             "ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)";
