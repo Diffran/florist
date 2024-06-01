@@ -34,8 +34,12 @@ public class QueriesSQL {
             "JOIN stock s ON shp.stock_id_stock = s.id_stock " +
             "WHERE s.florist_id_florist = ?";
 
-    public static final String deleteProductFromStock = "UPDATE stock_has_product SET quantity = quantity - ? " +
+    public static final String updateProductFromStock = "UPDATE stock_has_product SET quantity = quantity - ? " +
             "WHERE stock_id_stock = (SELECT id_stock FROM stock WHERE florist_id_florist = ?) AND product_id_product = ?";
+
+    public static final String deleteProductFromFloristStockByID = "DELETE FROM stock_has_product WHERE stock_id_stock = (SELECT id_stock FROM stock WHERE florist_id_florist = ?) AND product_id_product = ?";
+
+    public static final String updateProductByID = "UPDATE product SET quantity = ? WHERE id_product = ?";
 
     public static final String addProductToStock = "INSERT INTO stock_has_product (quantity, stock_id_stock, product_id_product) " +
             "VALUES (?, (SELECT id_stock FROM stock WHERE florist_id_florist = ?), ?) " +

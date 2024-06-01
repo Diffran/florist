@@ -84,10 +84,11 @@ public class MenuFlorist {
         do {
             System.out.println("-----------STOCK MENU--------------");
             System.out.println("1- ADD PRODUCT");
-            System.out.println("2- DELETE PRODUCT");
-            System.out.println("3- TOTAL STOCK PRICE");
-            System.out.println("4- LIST STOCK");
-            System.out.println("5- EXIT");
+            System.out.println("2- UPDATE PRODUCT QUANTITY");
+            System.out.println("3- DELETE PRODUCT");
+            System.out.println("4- TOTAL STOCK PRICE");
+            System.out.println("5- LIST STOCK");
+            System.out.println("6- EXIT");
 
             optionStock = MainMenu.SC.nextLine();
             try {
@@ -96,15 +97,18 @@ public class MenuFlorist {
                         addProductToStock();
                         break;
                     case "2":
-                        deleteProductFromStock();
+                        updateProductFromStock();
                         break;
                     case "3":
-                        getTotalStockPrice();
+                        deleteProduct(floristID);
                         break;
                     case "4":
-                        stockListMenu();
+                        getTotalStockPrice();
                         break;
                     case "5":
+                        stockListMenu();
+                        break;
+                    case "6":
                         menuFlorist(floristID);
                         break;
                     default:
@@ -137,18 +141,18 @@ public class MenuFlorist {
         }
     }
 
-    private static void deleteProductFromStock() {
+    private static void updateProductFromStock() {
         try {
             ConnectionSQL connectionSQL = ConnectionSQL.getInstance();
             connectionSQL.connect();
 
             // Prompt for product details and delete from stock
-            System.out.println("Enter product ID to delete: ");
+            System.out.println("Enter product ID: ");
             int productId = Integer.parseInt(MainMenu.SC.nextLine());
-            System.out.println("Enter quantity to delete: ");
+            System.out.println("Enter quantity to update: ");
             int quantity = Integer.parseInt(MainMenu.SC.nextLine());
 
-            connectionSQL.deleteProductFromStock(floristID, productId, quantity);
+            connectionSQL.updateProductFromStock(floristID, productId, quantity);
             connectionSQL.disconnect();
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
@@ -218,6 +222,24 @@ public class MenuFlorist {
             connectionSQL.connect();
 
             connectionSQL.printGlobalStockList(floristID);
+
+            connectionSQL.disconnect();
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    private static void deleteProduct(int floristID) {
+        printIndividualStockList();
+
+        try {
+            System.out.println("Enter product ID: ");
+            int productId = Integer.parseInt(MainMenu.SC.nextLine());
+
+            ConnectionSQL connectionSQL = ConnectionSQL.getInstance();
+            connectionSQL.connect();
+
+            connectionSQL.deleteProductFromFloristStockByID(floristID, productId);
 
             connectionSQL.disconnect();
         } catch (Exception e) {

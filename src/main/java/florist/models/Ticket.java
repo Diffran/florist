@@ -15,7 +15,7 @@ public class Ticket {
     private int id;
     private Date date;
     private Florist florist;
-    private HashMap<String, HashMap<String, Object>> productList; // productID -> quantity
+    private HashMap<String, HashMap<String, Object>> productList;
     private double totalPrice;
 
     public int getId() {

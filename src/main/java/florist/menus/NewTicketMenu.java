@@ -56,6 +56,7 @@ public class NewTicketMenu {
                         if (printTicketMenu()) {
                             System.out.println("Printed ticket in JSON");
                         }
+
                         MenuFlorist.ticketMenu();
                         break;
                     case "4":
@@ -74,6 +75,7 @@ public class NewTicketMenu {
     private static boolean printTicketMenu() {
         System.out.println("Print ticket? [Y][N]");
         userData = MainMenu.SC.nextLine();
+
         if (userData.equalsIgnoreCase("y")) {
             try {
                 printTicket(floristID);

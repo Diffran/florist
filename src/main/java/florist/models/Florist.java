@@ -3,7 +3,7 @@ package florist.models;
 public class Florist {
     private int id;
     private String name;
-    private double valorTotal1;
+    private transient double valorTotal1;
 
     public int getId() {
         return id;

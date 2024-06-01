@@ -340,8 +340,8 @@ public class ConnectionSQL {
         System.out.println("Product added to stock successfully.");
     }
 
-    public void deleteProductFromStock(int floristId, int productId, int quantity) throws SQLException {
-        String query = QueriesSQL.deleteProductFromStock;
+    public void updateProductFromStock(int floristId, int productId, int quantity) throws SQLException {
+        String query = QueriesSQL.updateProductFromStock;
 
         stmt = getConnection().prepareStatement(query);
         stmt.setInt(1, quantity);
@@ -544,5 +544,14 @@ public class ConnectionSQL {
         }
     }
 
+    public void deleteProductFromFloristStockByID(int idStock, int productId) throws SQLException {
+        String query = QueriesSQL.deleteProductFromFloristStockByID;
+        stmt = getConnection().prepareStatement(query);
+        stmt.setInt(1, idStock);
+        stmt.setInt(2, productId);
+
+        stmt.executeUpdate();
+        System.out.println("Product with ID: " + productId + "has been successfully deleted.");
+    }
 
 }
