@@ -1,0 +1,16 @@
+{
+  "idTICKET": 9,
+  "date": "Jun 1, 2024, 12:13:42 PM",
+  "florist": {
+    "id": 1,
+    "valorTotal": 0.0
+  },
+  "productList": {
+    "14": {
+      "quantity": 1,
+      "price": 7.0,
+      "name": "Sunflower"
+    }
+  },
+  "totalPrice": 7.0
+}

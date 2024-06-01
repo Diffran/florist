@@ -9,13 +9,13 @@ public class Tree extends Product{
     }
 
     @Override
-    public int getIdPRODUCT() {
-        return super.getIdPRODUCT();
+    public int getId() {
+        return super.getId();
     }
 
     @Override
-    public void setIdPRODUCT(int idPRODUCT) {
-        super.setIdPRODUCT(idPRODUCT);
+    public void setId(int id) {
+        super.setId(id);
     }
 
     @Override

@@ -1,0 +1,17 @@
+{
+  "id": 14,
+  "date": "Jun 1, 2024, 12:42:13 PM",
+  "florist": {
+    "id": 1,
+    "name": "Bloom Florist",
+    "valorTotal1": 0.0
+  },
+  "productList": {
+    "5": {
+      "quantity": 1,
+      "price": 30.0,
+      "name": "Cherry Blossom"
+    }
+  },
+  "totalPrice": 30.0
+}

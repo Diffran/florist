@@ -1,30 +1,29 @@
 package florist.models;
 
-import florist.models.Florist;
 import florist.services.sql.ConnectionSQL;
 import florist.services.sql.QueriesSQL;
 
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 
 import static florist.services.sql.ConnectionSQL.res;
 import static florist.services.sql.ConnectionSQL.stmt;
 
 public class Ticket {
-    private int idTICKET;
+    private int id;
     private Date date;
     private Florist florist;
-    private HashMap<Integer, Integer> productList; // productID -> quantity
+    private HashMap<String, HashMap<String, Object>> productList; // productID -> quantity
     private double totalPrice;
 
-    public int getIdTICKET() {
-        return idTICKET;
+    public int getId() {
+        return id;
     }
 
-    public void setIdTICKET(int idTICKET) {
-        this.idTICKET = idTICKET;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public Date getDate() {
@@ -43,11 +42,11 @@ public class Ticket {
         this.florist = florist;
     }
 
-    public HashMap<Integer, Integer> getProductList() {
+    public HashMap<String, HashMap<String, Object>> getProductList() {
         return productList;
     }
 
-    public void setProductList(HashMap<Integer, Integer> productList) throws SQLException {
+    public void setProductList(HashMap<String, HashMap<String, Object>> productList) throws SQLException {
         this.productList = productList;
         this.totalPrice = calculateTotalPrice(productList);
     }
@@ -56,22 +55,34 @@ public class Ticket {
         return totalPrice;
     }
 
-    private double calculateTotalPrice(HashMap<Integer, Integer> productList) throws SQLException {
+    private double calculateTotalPrice(HashMap<String, HashMap<String, Object>> productList) throws SQLException {
         double totalPrice = 0.0;
-        for (HashMap.Entry<Integer, Integer> entry : productList.entrySet()) {
-            int productId = entry.getKey();
-            int quantity = entry.getValue();
 
-            String query = QueriesSQL.calculateTotalPrice;
-            stmt = ConnectionSQL.getInstance().getConnection().prepareStatement(query);
-            stmt.setInt(1, productId);
-            res = stmt.executeQuery();
+        for (Map.Entry<String, HashMap<String, Object>> entry : productList.entrySet()) {
+            int productId = Integer.parseInt(entry.getKey());
+            HashMap<String, Object> quantityData = entry.getValue();
+            Integer quantityInteger = (Integer) quantityData.get("quantity");
 
-            if (res.next()) {
-                double price = res.getDouble("price");
-                totalPrice += price * quantity;
+            if (quantityInteger != null) {
+                int quantity = quantityInteger.intValue();
+
+                String query = QueriesSQL.calculateTotalPrice;
+                stmt = ConnectionSQL.getInstance().getConnection().prepareStatement(query);
+                stmt.setInt(1, productId);
+                res = stmt.executeQuery();
+
+                if (res.next()) {
+                    double price = res.getDouble("price");
+                    totalPrice += price * quantity;
+                }
+
+            } else {
+                System.out.println("Error: Cantidad nula para el producto con ID: " + productId);
             }
         }
+
         return totalPrice;
     }
+
+
 }

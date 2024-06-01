@@ -115,6 +115,25 @@ public class ConnectionSQL {
         }
     }
 
+    public String getFloristName(int floristId) throws SQLException {
+        String floristName = null;
+
+        try {
+            stmt = getConnection().prepareStatement(QueriesSQL.floristExistsSQL);
+            stmt.setInt(1, floristId);
+            res = stmt.executeQuery();
+
+            if (res.next()) {
+                floristName = res.getString("name");
+            }
+
+        } finally {
+            disconnect();
+        }
+
+        return floristName;
+    }
+
     public void deleteFlorist() throws NumberFormatException {
         int id;
         System.out.println("Please enter the ID of the florist you'd like to remove:");
@@ -353,7 +372,6 @@ public class ConnectionSQL {
 
     public void printIndividualStockList(int floristId) throws SQLException {
         String query = QueriesSQL.printIndividualStockList;
-
         stmt = getConnection().prepareStatement(query);
         stmt.setInt(1, floristId);
         res = stmt.executeQuery();
@@ -369,6 +387,8 @@ public class ConnectionSQL {
                             " - Unit Price: " + res.getDouble("price") + "€" + "\n"
             );
         }
+
+        disconnect();
     }
 
     public void printGlobalStockList(int floristId) throws SQLException {
@@ -510,5 +530,19 @@ public class ConnectionSQL {
 
         return count;
     }
+
+    public double getProductPrice(int productId) throws SQLException {
+        String query = QueriesSQL.getProductPrice;
+        stmt = getConnection().prepareStatement(query);
+        stmt.setInt(1, productId);
+        res = stmt.executeQuery();
+
+        if (res.next()) {
+            return res.getDouble("price");
+        } else {
+            return 0.0;
+        }
+    }
+
 
 }

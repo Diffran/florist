@@ -63,5 +63,8 @@ public class QueriesSQL {
     public static final String countTickets = "SELECT COUNT(*) AS total FROM ticket";
 
     public static final String calculateTotalPrice = "SELECT price FROM product WHERE id_product = ?";
+
+    public static final String getProductPrice = "SELECT price FROM product WHERE id_product = ?";
+
 }
 

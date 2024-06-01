@@ -1,17 +1,16 @@
 package florist.models;
 
 public class Florist {
-    private int idFLORIST;
-
+    private int id;
     private String name;
-    private double valorTotal;
+    private double valorTotal1;
 
-    public int getIdFLORIST() {
-        return idFLORIST;
+    public int getId() {
+        return id;
     }
 
-    public void setIdFLORIST(int idFLORIST) {
-        this.idFLORIST = idFLORIST;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -23,13 +22,11 @@ public class Florist {
     }
 
     public double getValorTotal() {
-        return valorTotal;
+        return valorTotal1;
     }
 
     public void setValorTotal(double valorTotal) {
-        this.valorTotal = valorTotal;
-    }
-
-    public void setId(int floristID) {
+        this.valorTotal1 = valorTotal;
     }
 }
+

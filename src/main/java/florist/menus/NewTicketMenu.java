@@ -16,10 +16,10 @@ import java.util.HashMap;
 public class NewTicketMenu {
     private static int floristID;
     private static String userData;
-    private static final HashMap<Integer, Integer> PRODUCT_LIST = new HashMap<>(); // key=productID and value=quantity
+    private static final HashMap<Integer, Integer> PRODUCT_LIST = new HashMap<>();
 
     public static void newTicketMenu(int floristId) {
-        floristID = floristId; // This should be okay.
+        floristID = floristId;
         String ticketOption;
         do {
             System.out.println("-----------NEW TICKET--------------");
@@ -72,9 +72,9 @@ public class NewTicketMenu {
     }
 
     private static boolean printTicketMenu() {
-        System.out.println("Print ticket? [yes][no]");
+        System.out.println("Print ticket? [Y][N]");
         userData = MainMenu.SC.nextLine();
-        if (userData.equals("yes")) {
+        if (userData.equalsIgnoreCase("y")) {
             try {
                 printTicket(floristID);
                 return true;
@@ -89,42 +89,60 @@ public class NewTicketMenu {
 
     private static void printTicket(int floristID) throws IOException, SQLException {
         Ticket ticket = new Ticket();
-        ticket.setIdTICKET(generateTicketId()); // Implement generateTicketId() to generate a unique ticket ID
+        ticket.setId(generateTicketId());
         ticket.setDate(new Date());
-        ticket.setFlorist(getFlorist(floristID)); // Implement getFlorist() to retrieve the Florist object
-        ticket.setProductList(NewTicketMenu.PRODUCT_LIST);
+
+        Florist florist = getFlorist(floristID);
+        ticket.setFlorist(florist);
+
+        HashMap<String, HashMap<String, Object>> productList = new HashMap<>();
+
+        for (HashMap.Entry<Integer, Integer> entry : PRODUCT_LIST.entrySet()) {
+            int productId = entry.getKey();
+            int quantity = entry.getValue();
+            String productName = ConnectionSQL.getInstance().getProductName(productId);
+            double productPrice = ConnectionSQL.getInstance().getProductPrice(productId);
+            HashMap<String, Object> productDetails = new HashMap<>();
+
+            productDetails.put("name", productName);
+            productDetails.put("quantity", quantity);
+            productDetails.put("price", productPrice);
+            productList.put(String.valueOf(productId), productDetails);
+        }
+
+        ticket.setProductList(productList);
 
         Gson gson = new Gson();
         String json = gson.toJson(ticket);
 
-        // Get the current date
         SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy");
         String dateFolderName = dateFormat.format(new Date());
 
-        // Create directories if they don't exist
         File directory = new File("tickets/" + dateFolderName);
         if (!directory.exists()) {
             directory.mkdirs();
         }
 
-        // Save the JSON string to a file
-        try (FileWriter writer = new FileWriter(directory + "/ticket_" + ticket.getIdTICKET() + ".json")) {
+        try (FileWriter writer = new FileWriter(directory + "/ticket_" + ticket.getId() + ".json")) {
             writer.write(json);
         }
 
-        System.out.println("Ticket saved to: " + directory + "/ticket_" + ticket.getIdTICKET() + ".json");
+        System.out.println("Ticket saved to: " + directory + "/ticket_" + ticket.getId() + ".json");
     }
+
+
 
     private static int generateTicketId() throws SQLException {
         return ConnectionSQL.getInstance().countTickets() + 1;
     }
 
     private static Florist getFlorist(int floristID) throws SQLException {
-        // Implement logic to retrieve the Florist object from the database using floristID
-        // For simplicity, return a dummy Florist object here
+        String floristName = ConnectionSQL.getInstance().getFloristName(floristID);
+
         Florist florist = new Florist();
         florist.setId(floristID);
-        florist.setName(florist.getName());
+        florist.setName(floristName);
+
         return florist;
     }
 
