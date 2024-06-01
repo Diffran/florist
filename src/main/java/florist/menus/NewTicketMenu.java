@@ -57,7 +57,7 @@ public class NewTicketMenu {
                             System.out.println("Printed ticket in JSON");
                         }
 
-                        MenuFlorist.ticketMenu();
+                        MenuTicket.ticketMenu(floristID);
                         break;
                     case "4":
                         MenuFlorist.menuFlorist(floristID);

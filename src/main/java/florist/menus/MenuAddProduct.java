@@ -1,6 +1,7 @@
 package florist.menus;
 
 import florist.exceptions.EmptyStringException;
+import static florist.menus.option.AddProductOption.*;
 import florist.services.sql.ConnectionSQL;
 
 import java.sql.SQLException;
@@ -13,6 +14,7 @@ public class MenuAddProduct {
             connectionSQL.connect();
 
             boolean exit = false;
+
             while (!exit) {
                 System.out.println("1. Add Tree");
                 System.out.println("2. Add Flower");
@@ -22,26 +24,17 @@ public class MenuAddProduct {
                 int choice = Integer.parseInt(MainMenu.SC.nextLine());
 
                 switch (choice) {
-                    case 1:
-                        connectionSQL.addTree();
-                        break;
-                    case 2:
-                        connectionSQL.addFlower();
-                        break;
-                    case 3:
-                        connectionSQL.addDecoration();
-                        break;
-                    case 4:
-                        MainMenu.mainMenu();
-                        //TODO: cuidado! termina el programa
-                        break;
-                    default:
-                        System.out.println("Invalid choice");
+                    case ADD_TREE -> connectionSQL.addTree();
+                    case ADD_FLOWER -> connectionSQL.addFlower();
+                    case ADD_DECORATION -> connectionSQL.addDecoration();
+                    case EXIT -> MainMenu.mainMenu();
+                    default -> System.out.println("Invalid choice");
                 }
             }
 
         } catch (EmptyStringException | SQLException e) {
             throw new RuntimeException(e);
+
         } finally {
             connectionSQL.disconnect();
         }

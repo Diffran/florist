@@ -28,6 +28,14 @@ public class QueriesSQL {
             "JOIN stock s ON shp.stock_id_stock = s.id_stock " +
             "WHERE s.florist_id_florist = ?";
 
+    public static final String searchProductQuantityInFloristStock = "SELECT quantity " +
+            "FROM stock_has_product " +
+            "WHERE product_id_product = ?;";
+
+    public static final String searchProductQuantity = "SELECT quantity " +
+            "FROM product " +
+            "WHERE id_product = ?;";
+
     public static final String getTotalStockValue = "SELECT SUM(p.price * shp.quantity) AS total_value " +
             "FROM product p " +
             "JOIN stock_has_product shp ON p.id_product = shp.product_id_product " +
@@ -40,10 +48,6 @@ public class QueriesSQL {
     public static final String deleteProductFromFloristStockByID = "DELETE FROM stock_has_product WHERE stock_id_stock = (SELECT id_stock FROM stock WHERE florist_id_florist = ?) AND product_id_product = ?";
 
     public static final String updateProductByID = "UPDATE product SET quantity = ? WHERE id_product = ?";
-
-
-
-
 
     public static final String addProductToStock = "INSERT INTO stock_has_product (quantity, stock_id_stock, product_id_product) " +
             "VALUES (?, (SELECT id_stock FROM stock WHERE florist_id_florist = ?), ?) " +

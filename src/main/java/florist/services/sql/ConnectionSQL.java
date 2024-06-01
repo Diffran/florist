@@ -172,9 +172,9 @@ public class ConnectionSQL {
                 stmt.setDouble(1, price);
                 stmt.setString(2, name);
                 stmt.setString(3, "tree");
-                stmt.setNull(4, Types.VARCHAR); // color
+                stmt.setNull(4, Types.VARCHAR);
                 stmt.setDouble(5, height);
-                stmt.setNull(6, Types.VARCHAR); // material_type
+                stmt.setNull(6, Types.VARCHAR);
                 stmt.setInt(7, quantity);
                 stmt.executeUpdate();
                 System.out.println("Tree: " + name + " added to the database");
@@ -211,6 +211,7 @@ public class ConnectionSQL {
                 stmt.setInt(7, quantity);
                 stmt.executeUpdate();
                 System.out.println("Flower: " + name + " added to the database");
+
             } else {
                 throw new EmptyStringException("at add Flower");
             }
@@ -239,8 +240,8 @@ public class ConnectionSQL {
                 stmt.setDouble(1, price);
                 stmt.setString(2, name);
                 stmt.setString(3, "decoration");
-                stmt.setNull(4, Types.VARCHAR); // color
-                stmt.setNull(5, Types.DOUBLE); // height
+                stmt.setNull(4, Types.VARCHAR);
+                stmt.setNull(5, Types.DOUBLE);
                 stmt.setString(6, materialType);
                 stmt.setInt(7, quantity);
                 stmt.executeUpdate();
@@ -255,7 +256,6 @@ public class ConnectionSQL {
         }
     }
 
-    // Add Stock
     public void createStock() {
         try {
             stmt = getConnection().prepareStatement(QueriesSQL.createNewStockSQL);
@@ -272,7 +272,6 @@ public class ConnectionSQL {
         }
     }
 
-    // List All Stocks
     public void listAllStocks() {
         try {
             st = getConnection().createStatement();
@@ -290,7 +289,6 @@ public class ConnectionSQL {
         }
     }
 
-    // Update Stock
     public void updateStock() {
         try {
             stmt = getConnection().prepareStatement(QueriesSQL.updateStockSQL);
@@ -311,7 +309,6 @@ public class ConnectionSQL {
         }
     }
 
-    // Delete Stock
     public void deleteStock() {
         try {
             stmt = getConnection().prepareStatement(QueriesSQL.deleteStockSQL);
@@ -328,7 +325,6 @@ public class ConnectionSQL {
         }
     }
 
-    // Methods for managing stock
     public void addProductToStock(int floristId, int productId, int quantity) throws SQLException {
         String query = QueriesSQL.addProductToStock;
 
@@ -338,6 +334,8 @@ public class ConnectionSQL {
         stmt.setInt(3, productId);
         stmt.executeUpdate();
         System.out.println("Product added to stock successfully.");
+
+        disconnect();
     }
 
     public void updateProductFromStock(int floristId, int productId, int quantity) throws SQLException {
@@ -354,6 +352,8 @@ public class ConnectionSQL {
         } else {
             System.out.println("Product not found in stock or insufficient quantity.");
         }
+
+        disconnect();
     }
 
     public double getTotalStockValue(int floristId) throws SQLException {
@@ -364,10 +364,14 @@ public class ConnectionSQL {
         res = stmt.executeQuery();
 
         if (res.next()) {
+            disconnect();
             return res.getDouble("total_value");
+
         } else {
+            disconnect();
             return 0.0;
         }
+
     }
 
     public void printIndividualStockList(int floristId) throws SQLException {
@@ -407,9 +411,10 @@ public class ConnectionSQL {
                             "€"
             );
         }
+
+        disconnect();
     }
 
-    // ticket
     public boolean isThereProduct(int floristId, int productId, int quantity) throws SQLException {
         String doWeHaveProduct = QueriesSQL.doWeHaveProduct;
         stmt = getConnection().prepareStatement(doWeHaveProduct);
@@ -419,8 +424,12 @@ public class ConnectionSQL {
 
         if (res.next()) {
             int availableQuantity = res.getInt("quantity");
+
+            disconnect();
             return availableQuantity >= quantity;
+
         } else {
+            disconnect();
             return false;
         }
     }
@@ -432,18 +441,21 @@ public class ConnectionSQL {
         res = stmt.executeQuery();
 
         if (res.next()) {
+            disconnect();
             return res.getString("name");
+
         } else {
+            disconnect();
             return null;
         }
     }
 
     public void completeTicket(int floristId, HashMap<Integer, Integer> productList) throws SQLException {
         Connection conn = getConnection();
+
         try {
             conn.setAutoCommit(false);
 
-            // Insert into ticket table
             String insertTicket = QueriesSQL.insertTicket;
             double totalPrice = calculateTotalPrice(productList);
             stmt = conn.prepareStatement(insertTicket, Statement.RETURN_GENERATED_KEYS);
@@ -453,16 +465,15 @@ public class ConnectionSQL {
 
             res = stmt.getGeneratedKeys();
             int ticketId = 0;
+
             if (res.next()) {
                 ticketId = res.getInt(1);
             }
 
-            // Update stock and insert into product_has_ticket
             for (HashMap.Entry<Integer, Integer> entry : productList.entrySet()) {
                 int productId = entry.getKey();
                 int quantity = entry.getValue();
 
-                // Update stock
                 String updateStock = QueriesSQL.updateStock;
                 stmt = conn.prepareStatement(updateStock);
                 stmt.setInt(1, quantity);
@@ -470,7 +481,6 @@ public class ConnectionSQL {
                 stmt.setInt(3, productId);
                 stmt.executeUpdate();
 
-                // Insert into product_has_ticket
                 String insertProductTicket = QueriesSQL.insertProductTicket;
                 stmt = conn.prepareStatement(insertProductTicket);
                 stmt.setInt(1, quantity);
@@ -480,16 +490,28 @@ public class ConnectionSQL {
             }
 
             conn.commit();
+
         } catch (SQLException e) {
             conn.rollback();
             throw e;
+
         } finally {
-            conn.setAutoCommit(true);
+            try {
+                if (stmt != null) {
+                    stmt.close();
+                }
+                conn.setAutoCommit(true);
+            } catch (SQLException ex) {
+                System.out.println("Error setting auto commit to true: " + ex);
+            }
+            disconnect();
         }
     }
 
+
     public double calculateTotalPrice(HashMap<Integer, Integer> productList) throws SQLException {
         double totalPrice = 0.0;
+
         for (HashMap.Entry<Integer, Integer> entry : productList.entrySet()) {
             int productId = entry.getKey();
             int quantity = entry.getValue();
@@ -504,6 +526,8 @@ public class ConnectionSQL {
                 totalPrice += price * quantity;
             }
         }
+
+        disconnect();
         return totalPrice;
     }
 
@@ -538,22 +562,68 @@ public class ConnectionSQL {
         res = stmt.executeQuery();
 
         if (res.next()) {
+            disconnect();
             return res.getDouble("price");
+
         } else {
+            disconnect();
             return 0.0;
         }
     }
 
+    public int getProductQuantityFromFloristStock(int productId) throws SQLException {
+        String query = QueriesSQL.searchProductQuantityInFloristStock;
+        stmt = getConnection().prepareStatement(query);
+        stmt.setInt(1, productId);
+        res = stmt.executeQuery();
+
+        if (res.next()) {
+            disconnect();
+            return res.getInt("quantity");
+
+        } else {
+            disconnect();
+            return 0;
+        }
+    }
+
+    public int getProductQuantity(int productId) throws SQLException {
+        String query = QueriesSQL.searchProductQuantity;
+        stmt = getConnection().prepareStatement(query);
+        stmt.setInt(1, productId);
+        res = stmt.executeQuery();
+
+        if (res.next()) {
+            disconnect();
+            return res.getInt("quantity");
+
+        } else {
+            disconnect();
+            return 0;
+        }
+    }
+
+    public void addProductBack(Connection conn, int quantityUpdated, int productId) throws SQLException {
+        String addBackQuery = QueriesSQL.updateProductByID;
+        stmt = conn.prepareStatement(addBackQuery);
+        stmt.setInt(1, quantityUpdated);
+        stmt.setInt(2, productId);
+        stmt.executeUpdate();
+    }
+
 
     public void deleteProductFromFloristStockByID(int floristId, int productId) throws SQLException {
-        Connection conn = getConnection();
+        Connection conn = null;
         PreparedStatement stmt = null;
 
         try {
-            // Start transaction
+            conn = getConnection();
             conn.setAutoCommit(false);
 
-            // Step 1: Delete the product from the stock_has_product table
+            int quantityProduct = getProductQuantity(productId);
+            int quantity = getProductQuantityFromFloristStock(productId);
+            int quantityUpdated = quantityProduct + quantity;
+
             String deleteQuery = QueriesSQL.deleteProductFromFloristStockByID;
             stmt = conn.prepareStatement(deleteQuery);
             stmt.setInt(1, floristId);
@@ -563,30 +633,37 @@ public class ConnectionSQL {
             if (rowsDeleted > 0) {
                 System.out.println("Product with ID: " + productId + " has been successfully deleted from florist stock.");
 
-                // Step 2: Add the product back to the product table
-                String addBackQuery = QueriesSQL.updateProductByID;
-                stmt = conn.prepareStatement(addBackQuery);
-                stmt.setInt(1, productId);
-                stmt.executeUpdate();
+                addProductBack(conn, quantityUpdated, productId);
 
-                conn.commit(); // Commit the transaction
-                System.out.println("Product added back to the product table.");
+                conn.commit();
+                System.out.println("Product added back to the main stock.");
             } else {
                 System.out.println("Product not found in florist stock.");
-                conn.rollback(); // Rollback the transaction on failure
+                conn.rollback();
             }
+
         } catch (SQLException e) {
             if (conn != null) {
                 try {
-                    conn.rollback(); // Rollback the transaction on error
+                    conn.rollback();
                 } catch (SQLException ex) {
-                    ex.printStackTrace();
+                    System.out.println("Error rolling back transaction: " + ex);
                 }
             }
             throw e;
+
         } finally {
-            if (stmt != null) stmt.close();
-            conn.setAutoCommit(true);
+            if (stmt != null) {
+                stmt.close();
+            }
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    disconnect();
+                } catch (SQLException ex) {
+                    System.out.println("Error disconnecting: " + ex);
+                }
+            }
         }
     }
 
