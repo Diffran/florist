@@ -14,7 +14,7 @@ public class ConnectionSQL {
 
     private static final String URL = "jdbc:mysql://localhost:3306/florist";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "";
+    private static final String PASSWORD = "sugoalpomodoro";
     public static PreparedStatement stmt;
     private static Statement st;
     public static ResultSet res;
@@ -595,11 +595,11 @@ public class ConnectionSQL {
         res = stmt.executeQuery();
 
         if (res.next()) {
-            disconnect();
+        //    disconnect();
             return res.getInt("quantity");
 
         } else {
-            disconnect();
+         //   disconnect();
             return 0;
         }
     }

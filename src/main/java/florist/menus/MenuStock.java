@@ -39,7 +39,7 @@ public class MenuStock {
     private static void handleMenu() {
         System.out.println("-----------STOCK MENU--------------");
         System.out.println("1- GET PRODUCT FROM MAIN STOCK");
-        System.out.println("2- UPDATE PRODUCT QUANTITY FROM FLORIST");
+        System.out.println("2- RETURN PRODUCT FROM FLORIST TO MAIN STOCK");
         System.out.println("3- DELETE PRODUCT FROM FLORIST");
         System.out.println("4- TOTAL FLORIST STOCK VALUE");
         System.out.println("5- LIST FLORIST STOCK");
@@ -64,15 +64,12 @@ public class MenuStock {
     }
 
     private static void addProductToStock(int floristID) {
-        Connection conn = null;
         ConnectionSQL connectionSQL = ConnectionSQL.getInstance();
+        Connection conn = null;
 
         try {
-
             conn = connectionSQL.getConnection();
-            conn.setAutoCommit(false);
-
-            connectionSQL.connect();
+          //  conn.setAutoCommit(false);
 
             listAllProducts();
 
@@ -85,15 +82,16 @@ public class MenuStock {
 
             int quantityUpdated = quantityProduct - quantity;
 
-            connectionSQL.addProductBack2(quantityUpdated, productId);
+            connectionSQL.addProductBack2( quantityUpdated, productId);
+            connectionSQL.addProductToStock( floristID, productId, quantity);
 
-            connectionSQL.addProductToStock(floristID, productId, quantity);
+         //   conn.commit(); // Commit the transaction
 
-            conn.commit(); // Confirmar la transacción
         } catch (Exception e) {
             try {
                 if (conn != null) {
-                    conn.rollback(); // Revertir la transacción en caso de error
+                    conn.rollback(); // Rollback the transaction on error
+                    System.out.println("Rollback executed due to an error: " + e.getMessage());
                 }
             } catch (SQLException ex) {
                 System.out.println("Rollback error: " + ex.getMessage());
@@ -102,14 +100,15 @@ public class MenuStock {
         } finally {
             try {
                 if (conn != null && !conn.isClosed()) {
-                    conn.setAutoCommit(true);
-                    connectionSQL.disconnect();
+                    conn.setAutoCommit(true); // Reset autocommit
+                    connectionSQL.disconnect(); // Disconnect from the database
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                System.out.println("Error during final cleanup: " + e.getMessage());
             }
         }
     }
+
 
     private static void updateProductFromStock(int floristID) {
         try {

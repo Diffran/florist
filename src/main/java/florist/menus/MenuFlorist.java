@@ -18,7 +18,7 @@ public class MenuFlorist {
                 switch (optionFlorist) {
                     case STOCK -> MenuStock.stockMenu(floristID);
                     case TICKET -> MenuTicket.ticketMenu(floristID);
-                    case TOTAL_TICKET_SELL -> System.out.println("print totalSell");
+                    case TOTAL_TICKET_SELL -> System.out.println("print totalSales");
                     case EXIT_FLORIST -> MainMenu.mainMenu();
                     default -> System.out.println("Invalid option. Please try again.");
                 }
@@ -36,7 +36,7 @@ public class MenuFlorist {
         System.out.println("-----------FLORIST MENU--------------");
         System.out.println("1- STOCK");
         System.out.println("2- TICKET");
-        System.out.println("3- TOTAL TICKET SELL");
+        System.out.println("3- TOTAL SALES");
         System.out.println("4- EXIT");
     }
 }
