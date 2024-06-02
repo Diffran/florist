@@ -5,7 +5,6 @@ import static florist.menus.option.MenuStockOption.*;
 
 import florist.services.sql.ConnectionSQL;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -21,7 +20,7 @@ public class MenuStock {
 
                 switch (optionStock) {
                     case ADD_PRODUCT -> addProductToStock(floristID);
-                    case UPDATE_PRODUCT_QUANTITY -> updateProductFromStock(floristID);
+                    case RETURN_QUANTITY_TO_MAIN_STOCK -> returnQuantityToMainStock(floristID);
                     case DELETE_PRODUCT -> deleteProduct(floristID);
                     case TOTAL_STOCK_PRICE -> getTotalStockPrice(floristID);
                     case LIST_STOCK -> stockListMenu(floristID);
@@ -39,7 +38,7 @@ public class MenuStock {
     private static void handleMenu() {
         System.out.println("-----------STOCK MENU--------------");
         System.out.println("1- GET PRODUCT FROM MAIN STOCK");
-        System.out.println("2- UPDATE PRODUCT QUANTITY FROM FLORIST");
+        System.out.println("2- RETURN QUANTITY FROM FLORIST TO MAIN STOCK");
         System.out.println("3- DELETE PRODUCT FROM FLORIST");
         System.out.println("4- TOTAL FLORIST STOCK VALUE");
         System.out.println("5- LIST FLORIST STOCK");
@@ -64,16 +63,9 @@ public class MenuStock {
     }
 
     private static void addProductToStock(int floristID) {
-        Connection conn = null;
         ConnectionSQL connectionSQL = ConnectionSQL.getInstance();
 
         try {
-
-            conn = connectionSQL.getConnection();
-            conn.setAutoCommit(false);
-
-            connectionSQL.connect();
-
             listAllProducts();
 
             System.out.println("Enter product ID to add: ");
@@ -81,37 +73,15 @@ public class MenuStock {
             System.out.println("Enter quantity to add: ");
             int quantity = Integer.parseInt(MainMenu.SC.nextLine());
 
-            int quantityProduct = connectionSQL.getProductQuantity(productId);
+            connectionSQL.addProductToFloristStock(quantity, productId, floristID);
 
-            int quantityUpdated = quantityProduct - quantity;
-
-            connectionSQL.addProductBack2(quantityUpdated, productId);
-
-            connectionSQL.addProductToStock(floristID, productId, quantity);
-
-            conn.commit(); // Confirmar la transacción
         } catch (Exception e) {
-            try {
-                if (conn != null) {
-                    conn.rollback(); // Revertir la transacción en caso de error
-                }
-            } catch (SQLException ex) {
-                System.out.println("Rollback error: " + ex.getMessage());
-            }
             System.out.println("Error: " + e.getMessage());
-        } finally {
-            try {
-                if (conn != null && !conn.isClosed()) {
-                    conn.setAutoCommit(true);
-                    connectionSQL.disconnect();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
+
     }
 
-    private static void updateProductFromStock(int floristID) {
+    private static void returnQuantityToMainStock(int floristID) {
         try {
             ConnectionSQL connectionSQL = ConnectionSQL.getInstance();
             connectionSQL.connect();
@@ -122,7 +92,7 @@ public class MenuStock {
             System.out.println("Enter quantity to update: ");
             int quantity = Integer.parseInt(MainMenu.SC.nextLine());
 
-            connectionSQL.updateProductFromStock(floristID, productId, quantity);
+            connectionSQL.returnQuantityToMainStock(floristID, productId, quantity);
             connectionSQL.disconnect();
 
         } catch (Exception e) {
@@ -169,7 +139,7 @@ public class MenuStock {
             connectionSQL.connect();
 
             double totalStockPrice = connectionSQL.getTotalStockValue(floristID);
-            System.out.println("Total stock price: " + totalStockPrice);
+            System.out.println("Total stock price: " + totalStockPrice + "€");
 
             connectionSQL.disconnect();
 

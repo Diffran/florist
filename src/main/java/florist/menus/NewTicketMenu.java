@@ -1,6 +1,9 @@
 package florist.menus;
 
 import com.google.gson.Gson;
+
+import static florist.menus.option.NewTicketMenuOption.*;
+
 import florist.models.Florist;
 import florist.models.Ticket;
 import florist.services.sql.ConnectionSQL;
@@ -20,56 +23,33 @@ public class NewTicketMenu {
 
     public static void newTicketMenu(int floristId) {
         floristID = floristId;
-        String ticketOption;
-        do {
-            System.out.println("-----------NEW TICKET--------------");
-            System.out.println("1- ADD PRODUCT");
-            System.out.println("2- LIST ONGOING TICKET");
-            System.out.println("3- COMPLETED");
-            System.out.println("4- EXIT");
+        int ticketOption;
 
-            ticketOption = MainMenu.SC.nextLine();
+        do {
+            handleMenu();
+
+            ticketOption = Integer.parseInt(MainMenu.SC.nextLine().trim());
+
             try {
                 switch (ticketOption) {
-                    case "1":
-                        ConnectionSQL.getInstance().printIndividualStockList(floristID);
-                        System.out.println("Enter product ID: ");
-                        userData = MainMenu.SC.nextLine();
-                        int productID = Integer.parseInt(userData);
-
-                        System.out.println("Enter product quantity: ");
-                        userData = MainMenu.SC.nextLine();
-                        int quantity = Integer.parseInt(userData);
-
-                        if (ConnectionSQL.getInstance().isThereProduct(floristID, productID, quantity)) {
-                            PRODUCT_LIST.put(productID, quantity);
-                            System.out.println("Product added to ticket.");
-                        } else {
-                            System.out.println("Insufficient stock.");
-                        }
-                        break;
-                    case "2":
-                        listTicketProducts();
-                        break;
-                    case "3":
-                        completeTicket(floristID, PRODUCT_LIST);
-                        if (printTicketMenu()) {
-                            System.out.println("Printed ticket in JSON");
-                        }
-
-                        MenuTicket.ticketMenu(floristID);
-                        break;
-                    case "4":
-                        MenuFlorist.menuFlorist(floristID);
-                        break;
-                    default:
-                        System.out.println("Invalid option. Please try again.");
-                        break;
+                    case ADD_PRODUCT -> addProduct();
+                    case LIST_ONGOING_TICKET -> listTicketProducts();
+                    case COMPLETED -> completeTicket(floristID);
+                    case EXIT_NEW_TICKET -> MenuFlorist.menuFlorist(floristID);
+                    default -> System.out.println("Invalid option. Please try again.");
                 }
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
             }
-        } while (!ticketOption.equals("4"));
+        } while (ticketOption != 4);
+    }
+
+    private static void handleMenu() {
+        System.out.println("-----------NEW TICKET--------------");
+        System.out.println("1- ADD PRODUCT");
+        System.out.println("2- LIST ONGOING TICKET");
+        System.out.println("3- COMPLETED");
+        System.out.println("4- EXIT");
     }
 
     private static boolean printTicketMenu() {
@@ -132,9 +112,42 @@ public class NewTicketMenu {
         System.out.println("Ticket saved to: " + directory + "/ticket_" + ticket.getId() + ".json");
     }
 
+    private static void addProduct() throws SQLException {
+        ConnectionSQL.getInstance().printIndividualStockList(floristID);
+        System.out.println("Enter product ID: ");
+        userData = MainMenu.SC.nextLine();
+        int productID = Integer.parseInt(userData);
+
+        System.out.println("Enter product quantity: ");
+        userData = MainMenu.SC.nextLine();
+        int quantity = Integer.parseInt(userData);
+
+        if (ConnectionSQL.getInstance().isThereProduct(floristID, productID, quantity)) {
+            PRODUCT_LIST.put(productID, quantity);
+            System.out.println("Product added to ticket.");
+        } else {
+            System.out.println("Insufficient stock.");
+        }
+    }
+
+    private static void completeTicket(int floristId) {
+        if (PRODUCT_LIST.isEmpty()) {
+            System.out.println("There are no products on the ticket.");
+            return;
+        }
+
+        ConnectionSQL.getInstance().completeTicket(floristId, PRODUCT_LIST);
+        System.out.println("Ticket completed and stock updated.");
+
+        if (printTicketMenu()) {
+            System.out.println("Printed ticket in JSON.");
+        }
+
+        MenuTicket.ticketMenu(floristID);
+    }
 
 
-    private static int generateTicketId() throws SQLException {
+    private static int generateTicketId() {
         return ConnectionSQL.getInstance().countTickets() + 1;
     }
 
@@ -148,26 +161,14 @@ public class NewTicketMenu {
         return florist;
     }
 
-    private static void listTicketProducts() {
+    private static void listTicketProducts() throws SQLException {
         System.out.println("Products in the ticket:");
         for (HashMap.Entry<Integer, Integer> entry : PRODUCT_LIST.entrySet()) {
             int productId = entry.getKey();
             int quantity = entry.getValue();
-            try {
-                String productName = ConnectionSQL.getInstance().getProductName(productId);
-                System.out.println("Product ID: " + productId + ", Name: " + productName + ", Quantity: " + quantity);
-            } catch (SQLException e) {
-                System.out.println("Error: " + e.getMessage());
-            }
+            String productName = ConnectionSQL.getInstance().getProductName(productId);
+            System.out.println("Product ID: " + productId + ", Name: " + productName + ", Quantity: " + quantity);
         }
     }
 
-    private static void completeTicket(int floristId, HashMap<Integer, Integer> productList) {
-        try {
-            ConnectionSQL.getInstance().completeTicket(floristId, productList);
-            System.out.println("Ticket completed and stock updated.");
-        } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-    }
 }

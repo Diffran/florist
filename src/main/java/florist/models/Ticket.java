@@ -48,23 +48,16 @@ public class Ticket {
 
     public void setProductList(HashMap<String, HashMap<String, Object>> productList) throws SQLException {
         this.productList = productList;
-        this.totalPrice = calculateTotalPrice(productList);
-    }
-
-    public double getTotalPrice() {
-        return totalPrice;
+        totalPrice = calculateTotalPrice(productList);
     }
 
     private double calculateTotalPrice(HashMap<String, HashMap<String, Object>> productList) throws SQLException {
-        double totalPrice = 0.0;
-
         for (Map.Entry<String, HashMap<String, Object>> entry : productList.entrySet()) {
             int productId = Integer.parseInt(entry.getKey());
             HashMap<String, Object> quantityData = entry.getValue();
             Integer quantityInteger = (Integer) quantityData.get("quantity");
 
             if (quantityInteger != null) {
-                int quantity = quantityInteger.intValue();
 
                 String query = QueriesSQL.getProductPrice;
                 stmt = ConnectionSQL.getInstance().getConnection().prepareStatement(query);
@@ -73,7 +66,7 @@ public class Ticket {
 
                 if (res.next()) {
                     double price = res.getDouble("price");
-                    totalPrice += price * quantity;
+                    totalPrice += price * quantityInteger;
                 }
 
             } else {
@@ -83,6 +76,5 @@ public class Ticket {
 
         return totalPrice;
     }
-
 
 }
