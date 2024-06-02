@@ -139,7 +139,7 @@ public class MenuStock {
             connectionSQL.connect();
 
             double totalStockPrice = connectionSQL.getTotalStockValue(floristID);
-            System.out.println("Total stock price: " + totalStockPrice);
+            System.out.println("Total stock price: " + totalStockPrice + "€");
 
             connectionSQL.disconnect();
 

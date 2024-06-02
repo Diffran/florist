@@ -37,7 +37,7 @@ public class ConnectionSQL {
                 Class.forName("com.mysql.cj.jdbc.Driver");
 
                 this.connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-                System.out.println("Conectado");
+                //System.out.println("Connected");
             } catch (ClassNotFoundException e) {
                 throw new SQLException(e);
             }
@@ -56,7 +56,7 @@ public class ConnectionSQL {
             try {
                 connection.close();
                 connection = null;
-                System.out.println("Disconnected");
+                //System.out.println("Disconnected");
 
             } catch (SQLException e) {
                 System.out.println("Error: " + e.getMessage());
@@ -337,8 +337,7 @@ public class ConnectionSQL {
 
             while (res.next()) {
                 System.out.println(
-                        "Product ID: " + res.getInt("id_product") +
-                                " - Product: " + res.getString("name") +
+                                "Product: " + res.getString("name") +
                                 " - Total Quantity: " + res.getInt("total_quantity") +
                                 " - Total Price: " + res.getDouble("total_price") +
                                 "€"
@@ -601,7 +600,7 @@ public class ConnectionSQL {
                 String productDetails = "ID: " + res.getInt("id_product") +
                         ", Name: " + res.getString("name") +
                         ", Price: " + res.getDouble("price") +
-                        ", Color: " + res.getString("color") +
+                        (res.getString("color") == null ? "" : " - Color: " + res.getString("color")) +
                         (res.getString("height") != null ? ", Height: " + res.getString("height") : "") +
                         (res.getString("material_type") != null ? ", Material Type: " + res.getString("material_type") : "") +
                         ", Quantity: " + res.getInt("quantity");
