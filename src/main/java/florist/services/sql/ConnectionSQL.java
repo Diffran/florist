@@ -86,7 +86,7 @@ public class ConnectionSQL {
         }
     }
 
-    public void printFlorist() throws EmptySQLTableException {
+    public void printFlorist() {
         try {
             getConnection();
             st = connection.createStatement();
@@ -327,19 +327,6 @@ public class ConnectionSQL {
         }
     }
 
-    public void addProductToStock(int floristId, int productId, int quantity) throws SQLException {
-        String query = QueriesSQL.addProductToStock;
-
-        stmt = getConnection().prepareStatement(query);
-        stmt.setInt(1, quantity);
-        stmt.setInt(2, floristId);
-        stmt.setInt(3, productId);
-        stmt.executeUpdate();
-        System.out.println("Product added to stock successfully.");
-
-        disconnect();
-    }
-
     public void updateProductFromStock(int floristId, int productId, int quantity) throws SQLException {
         String query = QueriesSQL.updateProductFromStock;
 
@@ -532,7 +519,7 @@ public class ConnectionSQL {
         return totalPrice;
     }
 
-    public int countTickets() throws SQLException {
+    public int countTickets() {
         int count = 0;
 
         try {
@@ -595,7 +582,7 @@ public class ConnectionSQL {
         res = stmt.executeQuery();
 
         if (res.next()) {
-            disconnect();
+            //disconnect();
             return res.getInt("quantity");
 
         } else {
@@ -604,21 +591,12 @@ public class ConnectionSQL {
         }
     }
 
-    public void addProductBack(Connection conn, int quantityUpdated, int productId) throws SQLException {
+    public void updateMainProduct(Connection conn, int quantityUpdated, int productId) throws SQLException {
         String addBackQuery = QueriesSQL.updateProductByID;
         stmt = conn.prepareStatement(addBackQuery);
         stmt.setInt(1, quantityUpdated);
         stmt.setInt(2, productId);
         stmt.executeUpdate();
-    }
-
-    public void addProductBack2(int quantityUpdated, int productId) throws SQLException {
-        String query = QueriesSQL.updateProductByID;
-        try (PreparedStatement pstmt = getConnection().prepareStatement(query)) {
-            pstmt.setInt(1, quantityUpdated);
-            pstmt.setInt(2, productId);
-            pstmt.executeUpdate();
-        }
     }
 
     public void deleteProductFromFloristStockByID(int floristId, int productId) throws SQLException {
@@ -642,10 +620,10 @@ public class ConnectionSQL {
             if (rowsDeleted > 0) {
                 System.out.println("Product with ID: " + productId + " has been successfully deleted from florist stock.");
 
-                addProductBack(conn, quantityUpdated, productId);
+                updateMainProduct(conn, quantityUpdated, productId);
 
                 conn.commit();
-                System.out.println("Product added back to the main stock.");
+
             } else {
                 System.out.println("Product not found in florist stock.");
                 conn.rollback();
@@ -701,6 +679,60 @@ public class ConnectionSQL {
         }
 
         return products;
+    }
+
+    public void addProductToFloristStock(int quantity, int productId, int floristId) throws SQLException {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+            conn = getConnection();
+            conn.setAutoCommit(false);
+
+            int quantityMainProduct = getProductQuantity(productId);
+            int quantityUpdated = quantityMainProduct - quantity;
+            updateMainProduct(conn, quantityUpdated, productId);
+
+            String query = QueriesSQL.addProductToStock;
+            stmt = getConnection().prepareStatement(query);
+            stmt.setInt(1, quantity);
+            stmt.setInt(2, floristId);
+            stmt.setInt(3, productId);
+            int rowsDeleted = stmt.executeUpdate();
+
+            if (rowsDeleted > 0) {
+                System.out.println("Product with ID: " + productId + " has been successfully added to florist stock.");
+
+                conn.commit();
+            } else {
+                System.out.println("Product not found in florist stock.");
+                conn.rollback();
+            }
+
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    System.out.println("Error rolling back transaction: " + ex);
+                }
+            }
+            throw e;
+
+        } finally {
+            if (stmt != null) {
+                stmt.close();
+            }
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    disconnect();
+                } catch (SQLException ex) {
+                    System.out.println("Error disconnecting: " + ex);
+                }
+            }
+        }
+
     }
 
 }

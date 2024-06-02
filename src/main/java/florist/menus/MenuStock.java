@@ -5,7 +5,6 @@ import static florist.menus.option.MenuStockOption.*;
 
 import florist.services.sql.ConnectionSQL;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -64,16 +63,9 @@ public class MenuStock {
     }
 
     private static void addProductToStock(int floristID) {
-        Connection conn = null;
         ConnectionSQL connectionSQL = ConnectionSQL.getInstance();
 
         try {
-
-            conn = connectionSQL.getConnection();
-            conn.setAutoCommit(false);
-
-            connectionSQL.connect();
-
             listAllProducts();
 
             System.out.println("Enter product ID to add: ");
@@ -81,34 +73,12 @@ public class MenuStock {
             System.out.println("Enter quantity to add: ");
             int quantity = Integer.parseInt(MainMenu.SC.nextLine());
 
-            int quantityProduct = connectionSQL.getProductQuantity(productId);
+            connectionSQL.addProductToFloristStock(quantity, productId, floristID);
 
-            int quantityUpdated = quantityProduct - quantity;
-
-            connectionSQL.addProductBack2(quantityUpdated, productId);
-
-            connectionSQL.addProductToStock(floristID, productId, quantity);
-
-            conn.commit(); // Confirmar la transacción
         } catch (Exception e) {
-            try {
-                if (conn != null) {
-                    conn.rollback(); // Revertir la transacción en caso de error
-                }
-            } catch (SQLException ex) {
-                System.out.println("Rollback error: " + ex.getMessage());
-            }
             System.out.println("Error: " + e.getMessage());
-        } finally {
-            try {
-                if (conn != null && !conn.isClosed()) {
-                    conn.setAutoCommit(true);
-                    connectionSQL.disconnect();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
+
     }
 
     private static void updateProductFromStock(int floristID) {
