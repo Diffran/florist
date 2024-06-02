@@ -3,6 +3,8 @@ package florist.menus;
 import static florist.menus.MenuFlorist.menuFlorist;
 import static florist.menus.option.MenuStockOption.*;
 
+import florist.exceptions.EmptySQLTableException;
+import florist.exceptions.EmptyStringException;
 import florist.services.sql.ConnectionSQL;
 
 import java.sql.Connection;
@@ -29,8 +31,10 @@ public class MenuStock {
                     default -> System.out.println("Invalid option. Please try again.");
                 }
 
-            } catch (Exception e) {
-                System.out.println("Error: " + e.getMessage());
+            } catch (NumberFormatException e) {
+                System.out.println(e.getMessage()+" Invalid input. Please enter a number.");
+            }catch(EmptySQLTableException e){
+                System.out.println(e.getMessage());
             }
         } while (optionStock != 5);
 
@@ -69,10 +73,10 @@ public class MenuStock {
 
         try {
 
-            conn = connectionSQL.getConnection();
+            conn = connectionSQL.getConnection();//TODO: ESTO
             conn.setAutoCommit(false);
 
-            connectionSQL.connect();
+            connectionSQL.connect();//I ESTO ES LO MISMO, MIRAD EL METODO
 
             listAllProducts();
 
@@ -90,7 +94,7 @@ public class MenuStock {
             connectionSQL.addProductToStock(floristID, productId, quantity);
 
             conn.commit(); // Confirmar la transacción
-        } catch (Exception e) {
+        } catch (SQLException e) {
             try {
                 if (conn != null) {
                     conn.rollback(); // Revertir la transacción en caso de error
@@ -111,7 +115,7 @@ public class MenuStock {
         }
     }
 
-    private static void updateProductFromStock(int floristID) {
+    private static void updateProductFromStock(int floristID) throws EmptySQLTableException {
         try {
             ConnectionSQL connectionSQL = ConnectionSQL.getInstance();
             connectionSQL.connect();
@@ -125,12 +129,12 @@ public class MenuStock {
             connectionSQL.updateProductFromStock(floristID, productId, quantity);
             connectionSQL.disconnect();
 
-        } catch (Exception e) {
+        } catch (SQLException | NumberFormatException e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
 
-    private static void printIndividualStockList(int floristID) {
+    private static void printIndividualStockList(int floristID) throws EmptySQLTableException {
         try {
             ConnectionSQL connectionSQL = ConnectionSQL.getInstance();
             connectionSQL.connect();
@@ -139,12 +143,12 @@ public class MenuStock {
 
             connectionSQL.disconnect();
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
 
-    private static void deleteProduct(int floristID) {
+    private static void deleteProduct(int floristID) throws EmptySQLTableException{
         printIndividualStockList(floristID);
 
         try {
@@ -158,7 +162,7 @@ public class MenuStock {
 
             connectionSQL.disconnect();
 
-        } catch (Exception e) {
+        } catch (SQLException|NumberFormatException e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
@@ -173,7 +177,7 @@ public class MenuStock {
 
             connectionSQL.disconnect();
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
         }
     }

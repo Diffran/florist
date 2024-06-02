@@ -2,6 +2,7 @@ package florist.services.sql;
 
 import florist.exceptions.EmptySQLTableException;
 import florist.exceptions.EmptyStringException;
+import florist.exceptions.InvalidDecorationType;
 import florist.menus.MainMenu;
 
 import java.sql.*;
@@ -14,7 +15,7 @@ public class ConnectionSQL {
 
     private static final String URL = "jdbc:mysql://localhost:3306/florist";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "";
+    private static final String PASSWORD = "Tysoncete24!";
     public static PreparedStatement stmt;
     private static Statement st;
     public static ResultSet res;
@@ -113,7 +114,7 @@ public class ConnectionSQL {
             disconnect();
             return true;
         } else {
-            throw new EmptySQLTableException("florist with id: " + id);
+            throw new EmptySQLTableException("florist with id: " + id+" doesn't exist");
         }
     }
 
@@ -224,7 +225,7 @@ public class ConnectionSQL {
         }
     }
 
-    public void addDecoration() throws SQLException, EmptyStringException {
+    public void addDecoration() throws  EmptyStringException, InvalidDecorationType, NumberFormatException {
         try {
             stmt = getConnection().prepareStatement(QueriesSQL.addProductSQL);
 
@@ -233,8 +234,11 @@ public class ConnectionSQL {
             System.out.println("Enter Decoration price: ");
             double price = Double.parseDouble(MainMenu.SC.nextLine());
             System.out.println("Enter Decoration material type (wood/plastic): ");
-            //TODO: personalizar exception sql por tipo mal ingresado en programa
             String materialType = MainMenu.SC.nextLine();
+            if(!(materialType.equalsIgnoreCase("wood")) && !(materialType.equalsIgnoreCase("plastic"))) {
+                throw new InvalidDecorationType();
+            }
+
             System.out.println("Enter Decoration quantity: ");
             int quantity = Integer.parseInt(MainMenu.SC.nextLine());
 
@@ -376,7 +380,7 @@ public class ConnectionSQL {
 
     }
 
-    public void printIndividualStockList(int floristId) {
+    public void printIndividualStockList(int floristId) throws EmptySQLTableException{
         String query = QueriesSQL.printIndividualStockList;
 
         try {
@@ -384,8 +388,8 @@ public class ConnectionSQL {
             stmt.setInt(1, floristId);
             res = stmt.executeQuery();
 
-            if (!res.isBeforeFirst()) { 
-                System.out.println("No product in stock");
+            if (!res.isBeforeFirst()) {
+                throw new EmptySQLTableException("Error empty Stock table");
             } else {
                 while (res.next()) {
                     System.out.println(
@@ -406,14 +410,14 @@ public class ConnectionSQL {
         }
     }
 
-    public void printGlobalStockList(int floristId) throws SQLException {
+    public void printGlobalStockList(int floristId) throws SQLException, EmptySQLTableException {
         String query = QueriesSQL.printGlobalStockList;
 
         stmt = getConnection().prepareStatement(query);
         stmt.setInt(1, floristId);
         res = stmt.executeQuery();
         if (!res.isBeforeFirst()) {
-            System.out.println("No product in stock");
+            throw new EmptySQLTableException("Error empty Stock table");
         } else {
             while (res.next()) {
                 System.out.println(
@@ -545,7 +549,7 @@ public class ConnectionSQL {
         return totalPrice;
     }
 
-    public int countTickets() throws SQLException {
+    public int countTickets(){
         int count = 0;
 
         try {

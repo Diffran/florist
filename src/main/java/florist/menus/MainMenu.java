@@ -1,5 +1,6 @@
 package florist.menus;
 
+import florist.exceptions.EmptyStringException;
 import florist.services.sql.ConnectionSQL;
 import florist.exceptions.EmptySQLTableException;
 
@@ -29,8 +30,6 @@ public class MainMenu {
                         loadMenuFlorist();
                     }
                     case DELETE_FLORIST -> {
-                        System.out.println("se imprimen todas las florists");
-                        floristName();
                         connection.printFlorist();
                         connection.deleteFlorist();
                     }
@@ -39,20 +38,16 @@ public class MainMenu {
                         MenuAddProduct.menuAddProduct();
                     }
                     case EXIT -> {
-                        System.out.println("Exit program...");
                         SC.close();
                         System.exit(0);
                     }
                     default -> System.out.println("Invalid option. Please try again.");
                 }
             } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a number.");
-                option = -1;
-            } catch (Exception e) {
+                System.out.println(e.getMessage()+" Invalid input. Please enter a number.");
+            } catch (SQLException | EmptyStringException |EmptySQLTableException e) {
                 System.out.println("An error occurred: " + e.getMessage());
-                option = -1;
             }
-
         } while (option != 5);
     }
 
@@ -63,11 +58,6 @@ public class MainMenu {
         System.out.println("3- DELETE FLORIST");
         System.out.println("4- ADD NEW PRODUCT");
         System.out.println("5- EXIT");
-    }
-
-    private static void floristName() {
-        System.out.println("Enter Florist Name: ");
-        SC.nextLine();
     }
 
     private static void loadMenuFlorist() throws NumberFormatException, EmptySQLTableException, SQLException {
