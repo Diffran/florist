@@ -4,10 +4,10 @@ import static florist.menus.MenuFlorist.menuFlorist;
 import static florist.menus.option.MenuTicketOption.*;
 
 public class MenuTicket {
-    public static void ticketMenu(int floristID) {
+    public static void ticketMenu(int floristID){
         int optionTicket = 0;
 
-        do {
+        do{
             handleMenu();
 
             try {
@@ -25,7 +25,7 @@ public class MenuTicket {
                 System.out.println("sha de canvia lexception");//borrar
             }
 
-        } while (optionTicket != 3);
+        }while(optionTicket != 3);
     }
 
     private static void handleMenu() {

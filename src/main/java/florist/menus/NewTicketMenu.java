@@ -26,7 +26,11 @@ public class NewTicketMenu {
         int ticketOption;
 
         do {
-            handleMenu();
+            System.out.println("-----------NEW TICKET--------------");
+            System.out.println("1- ADD PRODUCT");
+            System.out.println("2- LIST ONGOING TICKET");
+            System.out.println("3- COMPLETED");
+            System.out.println("4- EXIT");
 
             ticketOption = Integer.parseInt(MainMenu.SC.nextLine().trim());
 
@@ -34,7 +38,7 @@ public class NewTicketMenu {
                 switch (ticketOption) {
                     case ADD_PRODUCT -> addProduct();
                     case LIST_ONGOING_TICKET -> listTicketProducts();
-                    case COMPLETED -> completeTicket(floristID);
+                    case COMPLETED -> completeTicket(floristID, PRODUCT_LIST);
                     case EXIT_NEW_TICKET -> MenuFlorist.menuFlorist(floristID);
                     default -> System.out.println("Invalid option. Please try again.");
                 }
@@ -42,14 +46,6 @@ public class NewTicketMenu {
                 System.out.println("Error: " + e.getMessage());
             }
         } while (ticketOption != 4);
-    }
-
-    private static void handleMenu() {
-        System.out.println("-----------NEW TICKET--------------");
-        System.out.println("1- ADD PRODUCT");
-        System.out.println("2- LIST ONGOING TICKET");
-        System.out.println("3- COMPLETED");
-        System.out.println("4- EXIT");
     }
 
     private static boolean printTicketMenu() {
@@ -130,22 +126,20 @@ public class NewTicketMenu {
         }
     }
 
-    private static void completeTicket(int floristId) {
-        if (PRODUCT_LIST.isEmpty()) {
-            System.out.println("There are no products on the ticket.");
-            return;
+    private static void completeTicket(int floristId, HashMap<Integer, Integer> productList) {
+        try {
+            ConnectionSQL.getInstance().completeTicket(floristId, productList);
+            System.out.println("Ticket completed and stock updated.");
+        } catch (SQLException e) {
+            System.out.println("Error: " + e.getMessage());
         }
 
-        ConnectionSQL.getInstance().completeTicket(floristId, PRODUCT_LIST);
-        System.out.println("Ticket completed and stock updated.");
-
         if (printTicketMenu()) {
-            System.out.println("Printed ticket in JSON.");
+            System.out.println("Printed ticket in JSON");
         }
 
         MenuTicket.ticketMenu(floristID);
     }
-
 
     private static int generateTicketId() {
         return ConnectionSQL.getInstance().countTickets() + 1;
@@ -161,13 +155,17 @@ public class NewTicketMenu {
         return florist;
     }
 
-    private static void listTicketProducts() throws SQLException {
+    private static void listTicketProducts() {
         System.out.println("Products in the ticket:");
         for (HashMap.Entry<Integer, Integer> entry : PRODUCT_LIST.entrySet()) {
             int productId = entry.getKey();
             int quantity = entry.getValue();
-            String productName = ConnectionSQL.getInstance().getProductName(productId);
-            System.out.println("Product ID: " + productId + ", Name: " + productName + ", Quantity: " + quantity);
+            try {
+                String productName = ConnectionSQL.getInstance().getProductName(productId);
+                System.out.println("Product ID: " + productId + ", Name: " + productName + ", Quantity: " + quantity);
+            } catch (SQLException e) {
+                System.out.println("Error: " + e.getMessage());
+            }
         }
     }
 

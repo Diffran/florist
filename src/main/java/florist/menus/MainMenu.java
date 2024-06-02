@@ -29,6 +29,8 @@ public class MainMenu {
                         loadMenuFlorist();
                     }
                     case DELETE_FLORIST -> {
+                        System.out.println("se imprimen todas las florists");
+                        floristName();
                         connection.printFlorist();
                         connection.deleteFlorist();
                     }
