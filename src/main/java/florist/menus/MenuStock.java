@@ -39,7 +39,7 @@ public class MenuStock {
     private static void handleMenu() {
         System.out.println("-----------STOCK MENU--------------");
         System.out.println("1- GET PRODUCT FROM MAIN STOCK");
-        System.out.println("2- RETURN PRODUCT FROM FLORIST TO MAIN STOCK");
+        System.out.println("2- UPDATE PRODUCT QUANTITY FROM FLORIST");
         System.out.println("3- DELETE PRODUCT FROM FLORIST");
         System.out.println("4- TOTAL FLORIST STOCK VALUE");
         System.out.println("5- LIST FLORIST STOCK");
@@ -64,12 +64,15 @@ public class MenuStock {
     }
 
     private static void addProductToStock(int floristID) {
-        ConnectionSQL connectionSQL = ConnectionSQL.getInstance();
         Connection conn = null;
+        ConnectionSQL connectionSQL = ConnectionSQL.getInstance();
 
         try {
+
             conn = connectionSQL.getConnection();
-          //  conn.setAutoCommit(false);
+            conn.setAutoCommit(false);
+
+            connectionSQL.connect();
 
             listAllProducts();
 
@@ -82,16 +85,15 @@ public class MenuStock {
 
             int quantityUpdated = quantityProduct - quantity;
 
-            connectionSQL.addProductBack2( quantityUpdated, productId);
-            connectionSQL.addProductToStock( floristID, productId, quantity);
+            connectionSQL.addProductBack2(quantityUpdated, productId);
 
-         //   conn.commit(); // Commit the transaction
+            connectionSQL.addProductToStock(floristID, productId, quantity);
 
+            conn.commit(); // Confirmar la transacción
         } catch (Exception e) {
             try {
                 if (conn != null) {
-                    conn.rollback(); // Rollback the transaction on error
-                    System.out.println("Rollback executed due to an error: " + e.getMessage());
+                    conn.rollback(); // Revertir la transacción en caso de error
                 }
             } catch (SQLException ex) {
                 System.out.println("Rollback error: " + ex.getMessage());
@@ -100,15 +102,14 @@ public class MenuStock {
         } finally {
             try {
                 if (conn != null && !conn.isClosed()) {
-                    conn.setAutoCommit(true); // Reset autocommit
-                    connectionSQL.disconnect(); // Disconnect from the database
+                    conn.setAutoCommit(true);
+                    connectionSQL.disconnect();
                 }
             } catch (SQLException e) {
-                System.out.println("Error during final cleanup: " + e.getMessage());
+                e.printStackTrace();
             }
         }
     }
-
 
     private static void updateProductFromStock(int floristID) {
         try {
