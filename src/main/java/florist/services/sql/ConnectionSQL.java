@@ -412,16 +412,20 @@ public class ConnectionSQL {
         stmt = getConnection().prepareStatement(query);
         stmt.setInt(1, floristId);
         res = stmt.executeQuery();
-
-        while (res.next()) {
-            System.out.println(
-                    "Product ID: " + res.getInt("id_product") +
-                            " - Product: " + res.getString("name") +
-                            " - Total Quantity: " + res.getInt("total_quantity") +
-                            " - Total Price: " + res.getDouble("total_price") +
-                            "€"
-            );
+        if (!res.isBeforeFirst()) {
+            System.out.println("No product in stock");
+        } else {
+            while (res.next()) {
+                System.out.println(
+                        "Product ID: " + res.getInt("id_product") +
+                                " - Product: " + res.getString("name") +
+                                " - Total Quantity: " + res.getInt("total_quantity") +
+                                " - Total Price: " + res.getDouble("total_price") +
+                                "€"
+                );
+            }
         }
+
 
         disconnect();
     }
