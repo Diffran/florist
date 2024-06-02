@@ -3,8 +3,10 @@ package florist.menus;
 import static florist.menus.option.MenuFloristOption.*;
 
 public class MenuFlorist {
+    private static int floristID;
 
     public static void menuFlorist(int florist) {
+        floristID = florist;
         int optionFlorist = 0;
 
         do {
@@ -14,7 +16,9 @@ public class MenuFlorist {
                 optionFlorist = Integer.parseInt(MainMenu.SC.nextLine().trim());
 
                 switch (optionFlorist) {
-
+                    case STOCK -> MenuStock.stockMenu(floristID);
+                    case TICKET -> MenuTicket.ticketMenu(floristID);
+                    case TOTAL_TICKET_SELL -> System.out.println("print totalSales");
                     case EXIT_FLORIST -> MainMenu.mainMenu();
                     default -> System.out.println("Invalid option. Please try again.");
                 }
