@@ -182,7 +182,7 @@ public class MenuStock {
         }
     }
 
-    private static void printGlobalStockList(int floristID) {
+    private static void printGlobalStockList(int floristID) throws EmptySQLTableException{
         try {
             ConnectionSQL connectionSQL = ConnectionSQL.getInstance();
             connectionSQL.connect();
@@ -191,7 +191,7 @@ public class MenuStock {
 
             connectionSQL.disconnect();
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
@@ -214,7 +214,7 @@ public class MenuStock {
                     default -> System.out.println("Invalid option. Please try again.");
                 }
 
-            } catch (Exception e) {
+            } catch (EmptySQLTableException e) {
                 System.out.println("Error: " + e.getMessage());
             }
 
