@@ -70,7 +70,7 @@ public class QueriesSQL {
 
     public static final String updateProductByID = "UPDATE product SET quantity = ? WHERE id_product = ?";
 
-    public static final String updateProductFromStock = "UPDATE stock_has_product SET quantity = quantity - ? " +
+    public static final String returnProductToMainStock = "UPDATE stock_has_product SET quantity = quantity - ? " +
             "WHERE stock_id_stock = (SELECT id_stock FROM stock WHERE florist_id_florist = ?) AND product_id_product = ?";
 
     public static final String updateStock = "UPDATE stock_has_product shp " +

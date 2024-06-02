@@ -327,8 +327,8 @@ public class ConnectionSQL {
         }
     }
 
-    public void updateProductFromStock(int floristId, int productId, int quantity) throws SQLException {
-        String query = QueriesSQL.updateProductFromStock;
+    public void returnProductToMainStock(int floristId, int productId, int quantity) throws SQLException {
+        String query = QueriesSQL.returnProductToMainStock;
 
         stmt = getConnection().prepareStatement(query);
         stmt.setInt(1, quantity);
@@ -430,24 +430,21 @@ public class ConnectionSQL {
         res = stmt.executeQuery();
 
         if (res.next()) {
-            disconnect();
+            //disconnect();
             return res.getString("name");
 
         } else {
-            disconnect();
+            //disconnect();
             return null;
         }
     }
 
     public void completeTicket(int floristId, HashMap<Integer, Integer> productList) throws SQLException {
-        Connection conn = getConnection();
-
         try {
-            conn.setAutoCommit(false);
 
             String insertTicket = QueriesSQL.insertTicket;
             double totalPrice = calculateTotalPrice(productList);
-            stmt = conn.prepareStatement(insertTicket, Statement.RETURN_GENERATED_KEYS);
+            stmt = getConnection().prepareStatement(insertTicket, Statement.RETURN_GENERATED_KEYS);
             stmt.setDouble(1, totalPrice);
             stmt.setInt(2, floristId);
             stmt.executeUpdate();
@@ -464,36 +461,24 @@ public class ConnectionSQL {
                 int quantity = entry.getValue();
 
                 String updateStock = QueriesSQL.updateStock;
-                stmt = conn.prepareStatement(updateStock);
+                stmt = getConnection().prepareStatement(updateStock);
                 stmt.setInt(1, quantity);
                 stmt.setInt(2, floristId);
                 stmt.setInt(3, productId);
                 stmt.executeUpdate();
 
                 String insertProductTicket = QueriesSQL.insertProductTicket;
-                stmt = conn.prepareStatement(insertProductTicket);
+                stmt = getConnection().prepareStatement(insertProductTicket);
                 stmt.setInt(1, quantity);
                 stmt.setInt(2, ticketId);
                 stmt.setInt(3, productId);
                 stmt.executeUpdate();
             }
 
-            conn.commit();
 
         } catch (SQLException e) {
-            conn.rollback();
-            throw e;
+            System.out.println("Error: " + e.getMessage());
 
-        } finally {
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-                conn.setAutoCommit(true);
-            } catch (SQLException ex) {
-                System.out.println("Error setting auto commit to true: " + ex);
-            }
-            disconnect();
         }
     }
 
@@ -550,11 +535,11 @@ public class ConnectionSQL {
         res = stmt.executeQuery();
 
         if (res.next()) {
-            disconnect();
+            //disconnect();
             return res.getDouble("price");
 
         } else {
-            disconnect();
+            //disconnect();
             return 0.0;
         }
     }
