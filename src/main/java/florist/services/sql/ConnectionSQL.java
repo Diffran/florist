@@ -376,25 +376,34 @@ public class ConnectionSQL {
 
     }
 
-    public void printIndividualStockList(int floristId) throws SQLException {
+    public void printIndividualStockList(int floristId) {
         String query = QueriesSQL.printIndividualStockList;
-        stmt = getConnection().prepareStatement(query);
-        stmt.setInt(1, floristId);
-        res = stmt.executeQuery();
 
-        while (res.next()) {
-            System.out.println(
-                    "Product ID: " + res.getInt("id_product") +
-                            " - Product: " + res.getString("name") +
-                            (res.getString("height") == null ? "" : " - Height: " + res.getString("height")) +
-                            (res.getString("color") == null ? "" : " - Color: " + res.getString("color")) +
-                            (res.getString("material_type") == null ? "" : " - Material type: " + res.getString("material_type")) +
-                            " - Quantity: " + res.getInt("quantity") +
-                            " - Unit Price: " + res.getDouble("price") + "€" + "\n"
-            );
+        try {
+            stmt = getConnection().prepareStatement(query);
+            stmt.setInt(1, floristId);
+            res = stmt.executeQuery();
+
+            if (!res.isBeforeFirst()) { 
+                System.out.println("No product in stock");
+            } else {
+                while (res.next()) {
+                    System.out.println(
+                            "Product ID: " + res.getInt("id_product") +
+                                    " - Product: " + res.getString("name") +
+                                    (res.getString("height") == null ? "" : " - Height: " + res.getString("height")) +
+                                    (res.getString("color") == null ? "" : " - Color: " + res.getString("color")) +
+                                    (res.getString("material_type") == null ? "" : " - Material type: " + res.getString("material_type")) +
+                                    " - Quantity: " + res.getInt("quantity") +
+                                    " - Unit Price: " + res.getDouble("price") + "€" + "\n"
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error printing individual stock list: " + e.getMessage());
+        } finally {
+            disconnect();
         }
-
-        disconnect();
     }
 
     public void printGlobalStockList(int floristId) throws SQLException {
