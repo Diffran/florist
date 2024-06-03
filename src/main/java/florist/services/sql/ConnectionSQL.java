@@ -270,10 +270,16 @@ public class ConnectionSQL {
 
     public void returnQuantityToMainStock(int floristId, int productId, int quantity) {
         String query = QueriesSQL.returnProductToMainStock;
+        int quantityProduct = getProductQuantity(productId);
+        int quantityUpdated = quantityProduct + quantity;
+
+      //  if (quantity > quantityProduct   || quantity <= 0 ){
+     //       System.out.println("You are trying to get " + quantity + " Items but we have in stock " + quantityProduct + ", please check existence and try again");
+      //      return;
+     //   }
 
         try {
-            int quantityProduct = getProductQuantity(productId);
-            int quantityUpdated = quantityProduct + quantity;
+
 
             stmt = getConnection().prepareStatement(query);
             stmt.setInt(1, quantity);
@@ -645,11 +651,17 @@ public class ConnectionSQL {
     }
 
     public void addProductToFloristStock(int quantity, int productId, int floristId) throws SQLException {
-        try {
-            int quantityMainProduct = getProductQuantity(productId);
-            int quantityUpdated = quantityMainProduct - quantity;
-            updateMainProduct(quantityUpdated, productId);
+        int quantityMainProduct = getProductQuantity(productId);
+        int quantityUpdated = quantityMainProduct - quantity;
 
+        if (quantityMainProduct < quantity || quantity <= 0 ){
+            System.out.println("You are trying to get " + quantity + " Items but we have in stock " + quantityMainProduct + ", please check existence and try again");
+            return;
+        }
+
+        updateMainProduct(quantityUpdated, productId);
+
+        try {
             String query = QueriesSQL.addProductToStock;
             stmt = getConnection().prepareStatement(query);
             stmt.setInt(1, quantity);
