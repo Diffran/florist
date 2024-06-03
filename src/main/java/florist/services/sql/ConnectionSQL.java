@@ -15,7 +15,7 @@ public class ConnectionSQL {
 
     private static final String URL = "jdbc:mysql://localhost:3306/florist";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "";
+    private static final String PASSWORD = "sugoalpomodoro";
     public static PreparedStatement stmt;
     private static Statement st;
     public static ResultSet res;
@@ -269,7 +269,7 @@ public class ConnectionSQL {
     }
 
     public int getStockProductQuantity(int floristId, int productId) throws SQLException {
-        String query = QueriesSQL.quantityInStock;
+        String query = QueriesSQL.doWeHaveProduct;
         int quantity = 0;
 
         try (PreparedStatement stmt = getConnection().prepareStatement(query)) {

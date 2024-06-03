@@ -47,14 +47,7 @@ public class QueriesSQL {
             "FROM stock_has_product shp " +
             "JOIN stock s ON shp.stock_id_stock = s.id_stock " +
             "WHERE s.florist_id_florist = ? AND shp.product_id_product = ?";
-
-
-    public static final String quantityInStock = "SELECT shp.quantity " +
-            "FROM stock_has_product shp " +
-            "JOIN stock s ON shp.stock_id_stock = s.id_stock " +
-            "JOIN florist f ON s.florist_id_florist = f.id_florist " +
-            "WHERE f.id_florist = ? AND shp.product_id_product = ?";
-
+    
     public static final String searchProductQuantityInFloristStock = "SELECT quantity " +
             "FROM stock_has_product " +
             "WHERE product_id_product = ?;";
