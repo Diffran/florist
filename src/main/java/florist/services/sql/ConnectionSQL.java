@@ -315,7 +315,7 @@ public class ConnectionSQL {
             res = stmt.executeQuery();
 
             if (!res.isBeforeFirst()) {
-                throw new EmptySQLTableException("Error empty Stock table");
+                throw new EmptySQLTableException("Empty Stock");
             } else {
                 while (res.next()) {
                     System.out.println(
@@ -344,7 +344,7 @@ public class ConnectionSQL {
             stmt.setInt(1, floristId);
             res = stmt.executeQuery();
             if (!res.isBeforeFirst()) {
-                throw new EmptySQLTableException("Error empty Stock table");
+                throw new EmptySQLTableException("Empty Stock");
             } else {
                 while (res.next()) {
                     System.out.println(

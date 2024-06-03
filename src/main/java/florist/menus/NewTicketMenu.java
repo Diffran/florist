@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 
 import static florist.menus.option.NewTicketMenuOption.*;
 
+import florist.exceptions.EmptySQLTableException;
 import florist.models.Florist;
 import florist.models.Ticket;
 import florist.services.sql.ConnectionSQL;
@@ -112,7 +113,7 @@ public class NewTicketMenu {
         System.out.println("Ticket saved to: " + directory + "/ticket_" + ticket.getId() + ".json");
     }
 
-    private static void addProduct() throws SQLException {
+    private static void addProduct() throws SQLException , EmptySQLTableException {
         ConnectionSQL.getInstance().printIndividualStockList(floristID);
         System.out.println("Enter product ID: ");
         userData = MainMenu.SC.nextLine();
