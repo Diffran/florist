@@ -3,6 +3,7 @@ package florist.services.sql;
 public class QueriesSQL {
     //SELECT
     public static final String printAllTickets = "SELECT t.id_ticket, t.date, t.total_price, f.name FROM ticket t JOIN florist f ON t.florist_id_florist = ?";
+
     public static final String totalTicketsSQL = "SELECT SUM(total_price) from ticket where florist_id_florist =?";
 
     public static final String floristExistsSQL = "SELECT * FROM florist WHERE id_florist = ?";
@@ -46,6 +47,13 @@ public class QueriesSQL {
             "FROM stock_has_product shp " +
             "JOIN stock s ON shp.stock_id_stock = s.id_stock " +
             "WHERE s.florist_id_florist = ? AND shp.product_id_product = ?";
+
+
+    public static final String quantityInStock = "SELECT shp.quantity " +
+            "FROM stock_has_product shp " +
+            "JOIN stock s ON shp.stock_id_stock = s.id_stock " +
+            "JOIN florist f ON s.florist_id_florist = f.id_florist " +
+            "WHERE f.id_florist = ? AND shp.product_id_product = ?";
 
     public static final String searchProductQuantityInFloristStock = "SELECT quantity " +
             "FROM stock_has_product " +

@@ -268,15 +268,38 @@ public class ConnectionSQL {
         }
     }
 
-    public void returnQuantityToMainStock(int floristId, int productId, int quantity) {
+    public int getStockProductQuantity(int floristId, int productId) throws SQLException {
+        String query = QueriesSQL.quantityInStock;
+        int quantity = 0;
+
+        try (PreparedStatement stmt = getConnection().prepareStatement(query)) {
+            stmt.setInt(1, floristId);
+            stmt.setInt(2, productId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    quantity = rs.getInt("quantity");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error retrieving product quantity from stock: " + e.getMessage());
+            throw e;
+        }
+        return quantity;
+    }
+
+
+    public void returnQuantityToMainStock(int floristId, int productId, int quantity) throws SQLException {
         String query = QueriesSQL.returnProductToMainStock;
         int quantityProduct = getProductQuantity(productId);
         int quantityUpdated = quantityProduct + quantity;
 
-      //  if (quantity > quantityProduct   || quantity <= 0 ){
-     //       System.out.println("You are trying to get " + quantity + " Items but we have in stock " + quantityProduct + ", please check existence and try again");
-      //      return;
-     //   }
+        int quantityStock = getStockProductQuantity(floristId, productId);
+
+
+        if (quantity > quantityStock || quantity <= 0) {
+            System.out.println("You are trying to return " + quantity + " Items but we have in stock " + quantityStock + ", please check existence and try again");
+            return;
+        }
 
         try {
 
