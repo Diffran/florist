@@ -267,12 +267,41 @@ public class ConnectionSQL {
         }
     }
 
-    public void returnQuantityToMainStock(int floristId, int productId, int quantity) {
+    public int getStockProductQuantity(int floristId, int productId) throws SQLException {
+        String query = QueriesSQL.doWeHaveProduct;
+        int quantity = 0;
+
+        try (PreparedStatement stmt = getConnection().prepareStatement(query)) {
+            stmt.setInt(1, floristId);
+            stmt.setInt(2, productId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    quantity = rs.getInt("quantity");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error retrieving product quantity from stock: " + e.getMessage());
+            throw e;
+        }
+        return quantity;
+    }
+
+
+    public void returnQuantityToMainStock(int floristId, int productId, int quantity) throws SQLException {
         String query = QueriesSQL.returnProductToMainStock;
+        int quantityProduct = getProductQuantity(productId);
+        int quantityUpdated = quantityProduct + quantity;
+
+        int quantityStock = getStockProductQuantity(floristId, productId);
+
+
+        if (quantity > quantityStock || quantity <= 0) {
+            System.out.println("You are trying to return " + quantity + " Items but we have in stock " + quantityStock + ", please check existence and try again");
+            return;
+        }
 
         try {
-            int quantityProduct = getProductQuantity(productId);
-            int quantityUpdated = quantityProduct + quantity;
+
 
             stmt = getConnection().prepareStatement(query);
             stmt.setInt(1, quantity);
@@ -644,11 +673,17 @@ public class ConnectionSQL {
     }
 
     public void addProductToFloristStock(int quantity, int productId, int floristId) throws SQLException {
-        try {
-            int quantityMainProduct = getProductQuantity(productId);
-            int quantityUpdated = quantityMainProduct - quantity;
-            updateMainProduct(quantityUpdated, productId);
+        int quantityMainProduct = getProductQuantity(productId);
+        int quantityUpdated = quantityMainProduct - quantity;
 
+        if (quantityMainProduct < quantity || quantity <= 0 ){
+            System.out.println("You are trying to get " + quantity + " Items but we have in stock " + quantityMainProduct + ", please check existence and try again");
+            return;
+        }
+
+        updateMainProduct(quantityUpdated, productId);
+
+        try {
             String query = QueriesSQL.addProductToStock;
             stmt = getConnection().prepareStatement(query);
             stmt.setInt(1, quantity);
