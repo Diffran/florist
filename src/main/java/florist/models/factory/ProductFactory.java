@@ -4,47 +4,42 @@ import florist.models.product.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 public class ProductFactory {
 
-    public Product createProduct(String type, Object... params) {
-        Map<String, Object> parameters = createParametersMap(params);
+    private final Map<String, Function<Map<String, Object>, ? extends Product>> constructorMap;
 
-        switch (type) {
-            case "Tree" -> {
-                double height = (double) parameters.get("height");
-                double treePrice = (double) parameters.get("price");
-                return new Tree(height, treePrice);
-            }
-
-            case "Flower" -> {
-                String color = (String) parameters.get("color");
-                double flowerPrice = (double) parameters.get("price");
-                return new Flower(color, flowerPrice);
-            }
-
-            case "Decoration" -> {
-                MaterialDecorationType material = (MaterialDecorationType) parameters.get("material");
-                double decorationPrice = (double) parameters.get("price");
-                return new Decoration(material, decorationPrice);
-            }
-
-            default -> throw new IllegalArgumentException("Unknown product type: " + type);
-        }
+    public ProductFactory() {
+        constructorMap = new HashMap<>();
+        constructorMap.put("tree", this::createTree);
+        constructorMap.put("flower", this::createFlower);
+        constructorMap.put("decoration", this::createDecoration);
     }
 
-    private Map<String, Object> createParametersMap(Object... params) {
-        if (params.length % 2 != 0) {
-            throw new IllegalArgumentException("Parameters should be key-value pairs.");
+    public Product createProduct(String type, Map<String, Object> params) {
+        Function<Map<String, Object>, ? extends Product> constructor = constructorMap.get(type);
+        if (constructor == null) {
+            throw new IllegalArgumentException("Unknown product type: " + type);
         }
-        Map<String, Object> map = new HashMap<>();
-        for (int i = 0; i < params.length; i += 2) {
-            if (!(params[i] instanceof String)) {
-                throw new IllegalArgumentException("Key should be a string.");
-            }
-            map.put((String) params[i], params[i + 1]);
-        }
-        return map;
+        return constructor.apply(params);
     }
 
+    private Tree createTree(Map<String, Object> params) {
+        double height = (double) params.get("height");
+        double price = (double) params.get("price");
+        return new Tree(height, price);
+    }
+
+    private Flower createFlower(Map<String, Object> params) {
+        String color = (String) params.get("color");
+        double price = (double) params.get("price");
+        return new Flower(color, price);
+    }
+
+    private Decoration createDecoration(Map<String, Object> params) {
+        MaterialDecorationType material = (MaterialDecorationType) params.get("material");
+        double price = (double) params.get("price");
+        return new Decoration(material, price);
+    }
 }

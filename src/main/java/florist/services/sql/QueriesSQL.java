@@ -2,7 +2,21 @@ package florist.services.sql;
 
 public class QueriesSQL {
     //SELECT
-    public static final String printAllTickets = "SELECT t.id_ticket, t.date, t.total_price, f.name FROM ticket t JOIN florist f ON t.florist_id_florist = ?";
+    public static final String printAllTickets = "SELECT t.id_ticket, t.date, t.total_price, f.name AS florist_name " +
+            "FROM ticket t " +
+            "JOIN florist f ON t.florist_id_florist = f.id_florist " +
+            "WHERE f.id_florist = ?";
+
+    public static final String printIndividualTicket = "SELECT t.id_ticket, t.date, t.total_price, f.name " +
+            "FROM ticket t " +
+            "JOIN florist f ON t.florist_id_florist = f.id_florist " +
+            "WHERE t.id_ticket = ? AND t.florist_id_florist = ?";
+
+    public static final String printProductToIndividualTicket = "SELECT p.id_product, p.name, p.type, pt.quantity, p.price, " +
+            "p.color, p.height, p.material_type " +
+            "FROM product_has_ticket pt " +
+            "JOIN product p ON pt.product_id_product = p.id_product " +
+            "WHERE pt.ticket_id_ticket = ?";
 
     public static final String totalTickets = "SELECT SUM(total_price) from ticket where florist_id_florist =?";
 

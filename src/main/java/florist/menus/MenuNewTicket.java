@@ -17,7 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
-public class NewTicketMenu {
+public class MenuNewTicket {
     private static int floristID;
     private static String userData;
     private static final HashMap<Integer, Integer> PRODUCT_LIST = new HashMap<>();
@@ -36,7 +36,7 @@ public class NewTicketMenu {
                     case ADD_PRODUCT -> addProduct();
                     case LIST_ONGOING_TICKET -> listTicketProducts();
                     case COMPLETED -> completeTicket(floristID);
-                    case EXIT_NEW_TICKET -> MenuFlorist.menuFlorist(floristID);
+                    case EXIT_NEW_TICKET -> MenuTicket.ticketMenu(floristID);
                     default -> System.out.println("Invalid option. Please try again.");
                 }
             } catch (Exception e) {
@@ -113,7 +113,7 @@ public class NewTicketMenu {
         System.out.println("Ticket saved to: " + directory + "/ticket_" + ticket.getId() + ".json");
     }
 
-    private static void addProduct() throws SQLException , EmptySQLTableException {
+    private static void addProduct() throws EmptySQLTableException {
         ConnectionSQL.getInstance().printIndividualStockList(floristID);
         System.out.println("Enter product ID: ");
         userData = MainMenu.SC.nextLine();
@@ -132,13 +132,13 @@ public class NewTicketMenu {
     }
 
     private static void completeTicket(int floristId) {
-        if (PRODUCT_LIST.isEmpty()) {
-            System.out.println("There are no products on the ticket.");
+        if (isListEmpty())
             return;
-        }
 
         ConnectionSQL.getInstance().completeTicket(floristId, PRODUCT_LIST);
         System.out.println("Ticket completed and stock updated.");
+
+        PRODUCT_LIST.clear();
 
         if (printTicketMenu()) {
             System.out.println("Printed ticket in JSON.");
@@ -146,7 +146,6 @@ public class NewTicketMenu {
 
         MenuTicket.ticketMenu(floristID);
     }
-
 
     private static int generateTicketId() {
         return ConnectionSQL.getInstance().countTickets() + 1;
@@ -162,8 +161,12 @@ public class NewTicketMenu {
         return florist;
     }
 
-    private static void listTicketProducts() throws SQLException {
+    private static void listTicketProducts() {
+        if (isListEmpty())
+            return;
+
         System.out.println("Products in the ticket:");
+
         for (HashMap.Entry<Integer, Integer> entry : PRODUCT_LIST.entrySet()) {
             int productId = entry.getKey();
             int quantity = entry.getValue();
@@ -172,4 +175,13 @@ public class NewTicketMenu {
         }
     }
 
+    private static boolean isListEmpty() {
+        if (PRODUCT_LIST.isEmpty()) {
+            System.out.println("There are no products on the ticket.");
+
+            return true;
+        }
+
+        return false;
+    }
 }

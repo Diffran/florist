@@ -1,10 +1,10 @@
 package florist.models.product;
 
 public class Decoration extends Product{
-    private final MaterialDecorationType MATERIAL;
+    private MaterialDecorationType material;
 
     public Decoration(MaterialDecorationType material, double price){
-        MATERIAL = material;
+        this.material = material;
         setPrice(price);
     }
     @Override
@@ -38,6 +38,10 @@ public class Decoration extends Product{
     }
 
     public MaterialDecorationType getMaterialType() {
-        return MATERIAL;
+        return material;
+    }
+
+    public void setMaterialType(MaterialDecorationType material) {
+        this.material = material;
     }
 }

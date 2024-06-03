@@ -1,10 +1,10 @@
 package florist.models.product;
 
 public class Flower extends Product{
-    private final String COLOR;
+    private String color;
 
     public Flower(String color, double price){
-        COLOR = color;
+        this.color = color;
         setPrice(price);
     }
 
@@ -39,6 +39,10 @@ public class Flower extends Product{
     }
 
     public String getColor() {
-        return COLOR;
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 }

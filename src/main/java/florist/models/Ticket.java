@@ -51,6 +51,14 @@ public class Ticket {
         totalPrice = calculateTotalPrice(productList);
     }
 
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
     private double calculateTotalPrice(HashMap<String, HashMap<String, Object>> productList) throws SQLException {
         for (Map.Entry<String, HashMap<String, Object>> entry : productList.entrySet()) {
             int productId = Integer.parseInt(entry.getKey());

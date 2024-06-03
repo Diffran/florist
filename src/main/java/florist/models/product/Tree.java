@@ -1,10 +1,10 @@
 package florist.models.product;
 
 public class Tree extends Product{
-    private final double HEIGHT;
+    private double height;
 
     public Tree(double height, double price){
-        HEIGHT = height;
+        this.height = height;
         setPrice(price);
     }
 
@@ -38,7 +38,11 @@ public class Tree extends Product{
         super.setPrice(price);
     }
 
+    public void setHeight(double height) {
+        this.height = height;
+    }
+
     public double getHeight() {
-        return HEIGHT;
+        return height;
     }
 }

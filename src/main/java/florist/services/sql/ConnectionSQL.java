@@ -286,7 +286,6 @@ public class ConnectionSQL {
         return quantity;
     }
 
-
     public void returnQuantityToMainStock(int floristId, int productId, int quantity) throws SQLException {
         String query = QueriesSQL.returnProductToMainStock;
         int quantityProduct = getProductQuantity(productId);
