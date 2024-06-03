@@ -12,10 +12,6 @@ import java.util.List;
 
 public class ConnectionSQL {
     private Connection connection;
-
-    private static final String URL = "jdbc:mysql://localhost:3306/florist";
-    private static final String USERNAME = "root";
-    private static final String PASSWORD = "";
     public static PreparedStatement stmt;
     private static Statement st;
     public static ResultSet res;
@@ -33,12 +29,16 @@ public class ConnectionSQL {
     }
 
     public void connect() throws SQLException {
+        String url = "jdbc:mysql://localhost:3306/florist";
+        String username = "root";
+        String password = "";
+
         if (connection == null || connection.isClosed()) {
             try {
                 Class.forName("com.mysql.cj.jdbc.Driver");
 
-                this.connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-                //System.out.println("Connected");
+                this.connection = DriverManager.getConnection(url, username, password);
+
             } catch (ClassNotFoundException e) {
                 throw new SQLException(e);
             }
@@ -57,7 +57,6 @@ public class ConnectionSQL {
             try {
                 connection.close();
                 connection = null;
-                //System.out.println("Disconnected");
 
             } catch (SQLException e) {
                 System.out.println("Error: " + e.getMessage());
@@ -67,7 +66,7 @@ public class ConnectionSQL {
 
     public int createFlorist() throws EmptyStringException, EmptySQLTableException {
         try {
-            stmt = getConnection().prepareStatement(QueriesSQL.createNewFloristSQL);
+            stmt = getConnection().prepareStatement(QueriesSQL.createNewFlorist);
 
             System.out.println("Enter Florist name: ");
             userData = MainMenu.SC.nextLine();
@@ -100,7 +99,7 @@ public class ConnectionSQL {
         try {
             getConnection();
             st = connection.createStatement();
-            res = st.executeQuery(QueriesSQL.printFloristSQL);
+            res = st.executeQuery(QueriesSQL.printFlorist);
 
             while (res.next()) {
                 System.out.println("ID: " + res.getInt("id_florist") + " - NAME: " + res.getString("name"));
@@ -114,7 +113,7 @@ public class ConnectionSQL {
 
     public boolean floristExist(int id) throws EmptySQLTableException, SQLException {
         try {
-            stmt = getConnection().prepareStatement(QueriesSQL.floristExistsSQL);
+            stmt = getConnection().prepareStatement(QueriesSQL.floristExists);
             stmt.setInt(1, id);
             res = stmt.executeQuery();
 
@@ -131,7 +130,7 @@ public class ConnectionSQL {
     public String getFloristName(int floristId) throws SQLException {
         String floristName = null;
         try {
-            stmt = getConnection().prepareStatement(QueriesSQL.floristExistsSQL);
+            stmt = getConnection().prepareStatement(QueriesSQL.floristExists);
             stmt.setInt(1, floristId);
             res = stmt.executeQuery();
 
@@ -152,7 +151,7 @@ public class ConnectionSQL {
 
         try {
             if (floristExist(id)) {
-                stmt = getConnection().prepareStatement(QueriesSQL.deleteFloristSQL);
+                stmt = getConnection().prepareStatement(QueriesSQL.deleteFlorist);
                 stmt.setInt(1, id);
                 stmt.executeUpdate();
                 System.out.println("florist id: " + id + " successfully deleted");
@@ -166,7 +165,7 @@ public class ConnectionSQL {
 
     public void addTree() throws SQLException, EmptyStringException {
         try {
-            stmt = getConnection().prepareStatement(QueriesSQL.addProductSQL);
+            stmt = getConnection().prepareStatement(QueriesSQL.addProduct);
 
             System.out.println("Enter Tree name: ");
             String name = MainMenu.SC.nextLine();
@@ -199,7 +198,7 @@ public class ConnectionSQL {
 
     public void addFlower() throws SQLException, EmptyStringException {
         try {
-            stmt = getConnection().prepareStatement(QueriesSQL.addProductSQL);
+            stmt = getConnection().prepareStatement(QueriesSQL.addProduct);
 
             System.out.println("Enter Flower name: ");
             String name = MainMenu.SC.nextLine();
@@ -233,7 +232,7 @@ public class ConnectionSQL {
 
     public void addDecoration() throws  EmptyStringException, InvalidDecorationType, NumberFormatException {
         try {
-            stmt = getConnection().prepareStatement(QueriesSQL.addProductSQL);
+            stmt = getConnection().prepareStatement(QueriesSQL.addProduct);
 
             System.out.println("Enter Decoration name: ");
             String name = MainMenu.SC.nextLine();
@@ -674,10 +673,9 @@ public class ConnectionSQL {
         }
     }
 
-
     public double listTotalTickets(int id_florist) {
         double totalSales = 0;
-        String query = QueriesSQL.totalTicketsSQL;
+        String query = QueriesSQL.totalTickets;
 
         try (PreparedStatement stmt = getConnection().prepareStatement(query)) {
             stmt.setInt(1, id_florist);
@@ -697,7 +695,7 @@ public class ConnectionSQL {
 
     public void createNewStock(int floristID){
         try {
-            stmt = getConnection().prepareStatement(QueriesSQL.createNewStockSQL);
+            stmt = getConnection().prepareStatement(QueriesSQL.createNewStock);
 
             stmt.setInt(1, floristID);
             stmt.executeUpdate();
