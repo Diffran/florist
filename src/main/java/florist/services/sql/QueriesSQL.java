@@ -2,9 +2,8 @@ package florist.services.sql;
 
 public class QueriesSQL {
     //SELECT
+    public static final String printAllTickets = "SELECT t.id_ticket, t.date, t.total_price, f.name FROM ticket t JOIN florist f ON t.florist_id_florist = ?";
     public static final String totalTicketsSQL = "SELECT SUM(total_price) from ticket where florist_id_florist =?";
-    
-    public static final String listAllStocksSQL = "SELECT * FROM stock";
 
     public static final String floristExistsSQL = "SELECT * FROM florist WHERE id_florist = ?";
 
@@ -70,8 +69,6 @@ public class QueriesSQL {
 
 
     //UPDATES
-    public static final String updateStockSQL = "UPDATE stock SET florist_id_florist = ? WHERE id_stock = ?";
-
     public static final String updateProductByID = "UPDATE product SET quantity = ? WHERE id_product = ?";
 
     public static final String returnProductToMainStock = "UPDATE stock_has_product SET quantity = quantity - ? " +
@@ -85,9 +82,7 @@ public class QueriesSQL {
 
     //DELETES
     public static final String deleteFloristSQL = "DELETE FROM florist WHERE id_florist = ?";
-
-    public static final String deleteStockSQL = "DELETE FROM stock WHERE id_stock = ?";
-
+    
     public static final String deleteProductFromFloristStockByID = "DELETE FROM stock_has_product WHERE stock_id_stock = (SELECT id_stock FROM stock WHERE florist_id_florist = ?) AND product_id_product = ?";
 
 }
