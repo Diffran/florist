@@ -1,6 +1,15 @@
 package florist.menus;
 
+import florist.services.sql.ConnectionSQL;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
+
+
 import static florist.menus.option.MenuFloristOption.*;
+
 
 public class MenuFlorist {
 
@@ -16,7 +25,11 @@ public class MenuFlorist {
                 switch (optionFlorist) {
                     case STOCK -> MenuStock.stockMenu(florist);
                     case TICKET -> MenuTicket.ticketMenu(florist);
-                    case TOTAL_SALES -> System.out.println("print totalSell");
+                    case TOTAL_SALES -> {
+                        ConnectionSQL connectionSQL = ConnectionSQL.getInstance();
+                        double totalSales = connectionSQL.listTotalTickets(florist);
+                        System.out.println("Total sales: " + totalSales + "€");
+                    }
                     case EXIT_FLORIST -> MainMenu.mainMenu();
                     default -> System.out.println("Invalid option. Please try again.");
                 }
@@ -38,3 +51,5 @@ public class MenuFlorist {
         System.out.println("4- EXIT");
     }
 }
+
+

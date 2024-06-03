@@ -2,6 +2,8 @@ package florist.services.sql;
 
 public class QueriesSQL {
     //SELECT
+
+    public static final String totalTicketsSQL = "SELECT SUM(total_price) from ticket where florist_id_florist =?";
     public static final String listAllStocksSQL = "SELECT * FROM stock";
 
     public static final String floristExistsSQL = "SELECT * FROM florist WHERE id_florist = ?";

@@ -664,4 +664,24 @@ public class ConnectionSQL {
         }
     }
 
+    public double listTotalTickets(int id_florist) {
+        double totalSales = 0;
+        String query = QueriesSQL.totalTicketsSQL;
+
+        try (PreparedStatement stmt = getConnection().prepareStatement(query)) {
+            stmt.setInt(1, id_florist);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    totalSales = rs.getDouble(1);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error calculating tickets total value: " + e.getMessage());
+        } finally {
+            disconnect();
+        }
+
+        return totalSales;
+    }
+
 }
