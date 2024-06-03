@@ -65,7 +65,7 @@ public class ConnectionSQL {
         }
     }
 
-    public void createFlorist() throws EmptyStringException {
+    public int createFlorist() throws EmptyStringException, EmptySQLTableException {
         try {
             stmt = getConnection().prepareStatement(QueriesSQL.createNewFloristSQL);
 
@@ -79,11 +79,21 @@ public class ConnectionSQL {
             } else {
                 throw new EmptyStringException("at create Florist");
             }
+            stmt = getConnection().prepareStatement(QueriesSQL.selectFloristID);
+            stmt.setString(1,userData);
+
+            res = stmt.executeQuery();
+
+            while (res.next()) {
+                return res.getInt("id_florist");
+            }
+
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         } finally {
             disconnect();
         }
+        return 0;
     }
 
     public void printFlorist() {
@@ -660,6 +670,22 @@ public class ConnectionSQL {
             } catch (SQLException ex) {
                 System.out.println("Error closing statement: " + ex.getMessage());
             }
+            disconnect();
+        }
+    }
+
+    public void createNewStock(int floristID){
+        try {
+            stmt = getConnection().prepareStatement(QueriesSQL.createNewStockSQL);
+
+            stmt.setInt(1, floristID);
+            stmt.executeUpdate();
+
+            System.out.println("stock initialized");
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
             disconnect();
         }
     }

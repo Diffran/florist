@@ -2,8 +2,6 @@ package florist.services.sql;
 
 public class QueriesSQL {
     //SELECT
-    public static final String listAllStocksSQL = "SELECT * FROM stock";
-
     public static final String floristExistsSQL = "SELECT * FROM florist WHERE id_florist = ?";
 
     public static final String printFloristSQL = "SELECT * FROM florist";
@@ -15,6 +13,8 @@ public class QueriesSQL {
     public static final String getProductPrice = "SELECT price FROM product WHERE id_product = ?";
 
     public static final String countTickets = "SELECT COUNT(*) AS total FROM ticket";
+
+    public static final String selectFloristID = "SELECT  id_florist FROM FLORIST WHERE name=?";
 
     public static final String searchProductQuantity = "SELECT quantity " +
             "FROM product " +

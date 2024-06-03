@@ -24,7 +24,7 @@ public class MainMenu {
                 option = Integer.parseInt(SC.nextLine().trim());
 
                 switch (option) {
-                    case CREATE_NEW_FLORIST -> connection.createFlorist();
+                    case CREATE_NEW_FLORIST -> connection.createNewStock(connection.createFlorist());
                     case LOAD_FLORIST -> {
                         connection.printFlorist();
                         loadMenuFlorist();
