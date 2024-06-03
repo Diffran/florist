@@ -21,7 +21,6 @@ public class PersistenceJson {
         return instance;
     }
 
-
     public void saveFlorist(Florist florist) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
             oos.writeObject(florist);

@@ -26,18 +26,18 @@ public class QueriesSQL {
             "JOIN stock s ON shp.stock_id_stock = s.id_stock " +
             "WHERE s.florist_id_florist = ?";
 
-    public static final String printGlobalStockList = "SELECT p.id_product, p.name, SUM(p.price * shp.quantity) AS total_price, p.color, p.height, p.material_type, SUM(shp.quantity) AS total_quantity " +
+    public static final String printGlobalStockList = "SELECT p.id_product, p.name, shp.quantity, SUM(p.price * shp.quantity) AS total_price, p.color, p.height, p.material_type, SUM(shp.quantity) AS total_quantity " +
             "FROM product p " +
             "JOIN stock_has_product shp ON p.id_product = shp.product_id_product " +
             "JOIN stock s ON shp.stock_id_stock = s.id_stock " +
-            "WHERE s.florist_id_florist = ? " +
-            "GROUP BY p.name, p.price";
+            "WHERE s.florist_id_florist = ? AND shp.quantity > 0 " +
+            "GROUP BY p.name";
 
     public static final String printIndividualStockList = "SELECT p.id_product, p.name, p.price, p.color, p.height, p.material_type, shp.quantity " +
             "FROM product p " +
             "JOIN stock_has_product shp ON p.id_product = shp.product_id_product " +
             "JOIN stock s ON shp.stock_id_stock = s.id_stock " +
-            "WHERE s.florist_id_florist = ?";
+            "WHERE s.florist_id_florist = ? AND shp.quantity > 0";
 
     public static final String doWeHaveProduct = "SELECT shp.quantity " +
             "FROM stock_has_product shp " +
@@ -70,7 +70,7 @@ public class QueriesSQL {
 
     public static final String updateProductByID = "UPDATE product SET quantity = ? WHERE id_product = ?";
 
-    public static final String updateProductFromStock = "UPDATE stock_has_product SET quantity = quantity - ? " +
+    public static final String returnProductToMainStock = "UPDATE stock_has_product SET quantity = quantity - ? " +
             "WHERE stock_id_stock = (SELECT id_stock FROM stock WHERE florist_id_florist = ?) AND product_id_product = ?";
 
     public static final String updateStock = "UPDATE stock_has_product shp " +
@@ -87,4 +87,3 @@ public class QueriesSQL {
     public static final String deleteProductFromFloristStockByID = "DELETE FROM stock_has_product WHERE stock_id_stock = (SELECT id_stock FROM stock WHERE florist_id_florist = ?) AND product_id_product = ?";
 
 }
-
