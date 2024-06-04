@@ -29,7 +29,10 @@ CREATE TABLE IF NOT EXISTS `florist`.`stock` (
   `id_stock` INT NOT NULL AUTO_INCREMENT,
   `florist_id_florist` INT NOT NULL,
   PRIMARY KEY (`id_stock`),
-	FOREIGN KEY (`florist_id_florist`) REFERENCES `florist`.`florist` (`id_florist`));
+	 FOREIGN KEY (`florist_id_florist`)
+  REFERENCES `florist` (`id_florist`)
+  ON DELETE CASCADE);
+    
 
 
 -- -----------------------------------------------------
@@ -57,7 +60,8 @@ CREATE TABLE IF NOT EXISTS `florist`.`ticket` (
   `florist_id_florist` INT NOT NULL,
   PRIMARY KEY (`id_ticket`),
     FOREIGN KEY (`florist_id_florist`)
-    REFERENCES `florist`.`florist` (`id_florist`));
+    REFERENCES `florist`.`florist` (`id_florist`)
+    on delete cascade);
 
 
 -- -----------------------------------------------------
@@ -69,9 +73,11 @@ CREATE TABLE IF NOT EXISTS `florist`.`stock_has_product` (
   `product_id_product` INT NOT NULL,
   UNIQUE INDEX `unique_stock_product` (`stock_id_stock`, `product_id_product`),
   FOREIGN KEY (`stock_id_stock`)
-    REFERENCES `florist`.`stock` (`id_stock`),
+    REFERENCES `florist`.`stock` (`id_stock`)
+    on delete cascade,
   FOREIGN KEY (`product_id_product`)
     REFERENCES `florist`.`product` (`id_product`)
+    on delete cascade
 );
 
 
@@ -83,9 +89,11 @@ CREATE TABLE IF NOT EXISTS `florist`.`product_has_ticket` (
   `ticket_id_ticket` INT NOT NULL,
   `product_id_product` INT NOT NULL,
     FOREIGN KEY (`ticket_id_ticket`)
-    REFERENCES `florist`.`ticket` (`id_ticket`),
+    REFERENCES `florist`.`ticket` (`id_ticket`)
+    on delete cascade,
     FOREIGN KEY (`product_id_product`)
-    REFERENCES `florist`.`product` (`id_product`));
+    REFERENCES `florist`.`product` (`id_product`)
+    on delete cascade);
 
 
 

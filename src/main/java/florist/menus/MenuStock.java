@@ -5,6 +5,7 @@ import static florist.menus.option.MenuStockOption.*;
 
 import florist.exceptions.EmptySQLTableException;
 import florist.exceptions.EmptyStringException;
+import florist.exceptions.NotValidIDException;
 import florist.services.sql.ConnectionSQL;
 
 import java.sql.SQLException;
@@ -32,7 +33,7 @@ public class MenuStock {
 
             } catch (NumberFormatException e) {
                 System.out.println(e.getMessage()+" Invalid input. Please enter a number.");
-            }catch(EmptySQLTableException e){
+            }catch(EmptySQLTableException| NotValidIDException e){
                 System.out.println(e.getMessage());
             }
         } while (optionStock != 5);
@@ -66,7 +67,7 @@ public class MenuStock {
         }
     }
 
-    private static void addProductToStock(int floristID) {
+    private static void addProductToStock(int floristID) throws NotValidIDException{
         ConnectionSQL connectionSQL = ConnectionSQL.getInstance();
 
         try {
@@ -74,6 +75,10 @@ public class MenuStock {
 
             System.out.println("Enter product ID to add: ");
             int productId = Integer.parseInt(MainMenu.SC.nextLine());
+
+            if(productId<0){
+                throw new NotValidIDException("id invalid, please enter a valid ID.");
+            }
             System.out.println("Enter quantity to add: ");
             int quantity = Integer.parseInt(MainMenu.SC.nextLine());
 
@@ -98,13 +103,17 @@ public class MenuStock {
             printIndividualStockList(floristID);
             System.out.println("Enter product ID: ");
             int productId = Integer.parseInt(MainMenu.SC.nextLine());
+
+            if(productId<0){
+                throw new NotValidIDException("id invalid, please enter a valid ID.");
+            }
             System.out.println("Enter quantity to update: ");
             int quantity = Integer.parseInt(MainMenu.SC.nextLine());
 
             connectionSQL.returnQuantityToMainStock(floristID, productId, quantity);
             connectionSQL.disconnect();
 
-        } catch (SQLException e) {
+        } catch (SQLException| NotValidIDException e) {
             System.out.println("Error: " + e.getMessage());
         }catch (NumberFormatException e){
             System.out.println("Error: enter a number - "+e.getMessage());
@@ -143,6 +152,8 @@ public class MenuStock {
             System.out.println("Error: " + e.getMessage());
         }catch(NumberFormatException e){
             System.out.println("Error: enter a number - "+e.getMessage());
+        }catch(NotValidIDException e){
+            System.out.println("id invalid, please enter a valid ID.");
         }
     }
 

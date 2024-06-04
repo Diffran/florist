@@ -3,6 +3,7 @@ package florist.services.sql;
 import florist.exceptions.EmptySQLTableException;
 import florist.exceptions.EmptyStringException;
 import florist.exceptions.InvalidDecorationType;
+import florist.exceptions.NotValidIDException;
 import florist.menus.MainMenu;
 
 import java.sql.*;
@@ -286,7 +287,7 @@ public class ConnectionSQL {
         return quantity;
     }
 
-    public void returnQuantityToMainStock(int floristId, int productId, int quantity) throws SQLException {
+    public void returnQuantityToMainStock(int floristId, int productId, int quantity) throws SQLException , NotValidIDException{
         String query = QueriesSQL.returnProductToMainStock;
         int quantityProduct = getProductQuantity(productId);
         int quantityUpdated = quantityProduct + quantity;
@@ -400,7 +401,7 @@ public class ConnectionSQL {
         }
     }
 
-    public boolean isThereProduct(int floristId, int productId, int quantity) {
+    public boolean isThereProduct(int floristId, int productId, int quantity) throws NotValidIDException{
         String doWeHaveProduct = QueriesSQL.doWeHaveProduct;
 
         try {
@@ -413,7 +414,7 @@ public class ConnectionSQL {
                 int availableQuantity = res.getInt("quantity");
                 return availableQuantity >= quantity;
             } else {
-                return false;
+                throw new NotValidIDException("id invalid, please enter a valid ID.");
             }
         } catch (SQLException e) {
             System.out.println("Error checking product availability: " + e.getMessage());
@@ -575,7 +576,7 @@ public class ConnectionSQL {
         return quantity;
     }
 
-    public int getProductQuantity(int productId) {
+    public int getProductQuantity(int productId) throws NotValidIDException{
         int quantity = 0;
 
         try {
@@ -586,6 +587,8 @@ public class ConnectionSQL {
 
             if (quantityRes.next()) {
                 quantity = quantityRes.getInt("quantity");
+            }else{
+                throw new NotValidIDException("id invalid, please enter a valid ID.");
             }
         } catch (SQLException e) {
             System.out.println("Error fetching product quantity: " + e.getMessage());
@@ -604,7 +607,7 @@ public class ConnectionSQL {
         stmt.executeUpdate();
     }
 
-    public void deleteProductFromFloristStockByID(int floristId, int productId) {
+    public void deleteProductFromFloristStockByID(int floristId, int productId) throws NotValidIDException{
 
         try {
             int quantityProduct = getProductQuantity(productId);
@@ -672,7 +675,7 @@ public class ConnectionSQL {
         return products;
     }
 
-    public void addProductToFloristStock(int quantity, int productId, int floristId) throws SQLException {
+    public void addProductToFloristStock(int quantity, int productId, int floristId) throws SQLException , NotValidIDException{
         int quantityMainProduct = getProductQuantity(productId);
         int quantityUpdated = quantityMainProduct - quantity;
 

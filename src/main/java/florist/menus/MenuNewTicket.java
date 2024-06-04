@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import static florist.menus.option.NewTicketMenuOption.*;
 
 import florist.exceptions.EmptySQLTableException;
+import florist.exceptions.NotValidIDException;
 import florist.models.Florist;
 import florist.models.Ticket;
 import florist.services.sql.ConnectionSQL;
@@ -39,8 +40,10 @@ public class MenuNewTicket {
                     case EXIT_NEW_TICKET -> MenuTicket.ticketMenu(floristID);
                     default -> System.out.println("Invalid option. Please try again.");
                 }
-            } catch (Exception e) {
+            } catch (NotValidIDException | EmptySQLTableException e) {
                 System.out.println("Error: " + e.getMessage());
+            }catch(NumberFormatException e){
+                System.out.println(e.getMessage()+ "Invalid input. Please enter a number.");
             }
         } while (ticketOption != 4);
     }
@@ -113,11 +116,15 @@ public class MenuNewTicket {
         System.out.println("Ticket saved to: " + directory + "/ticket_" + ticket.getId() + ".json");
     }
 
-    private static void addProduct() throws EmptySQLTableException {
+    private static void addProduct() throws EmptySQLTableException, NotValidIDException {
         ConnectionSQL.getInstance().printIndividualStockList(floristID);
         System.out.println("Enter product ID: ");
         userData = MainMenu.SC.nextLine();
         int productID = Integer.parseInt(userData);
+
+        if(productID<0){
+            throw new NotValidIDException("id invalid, please enter a valid ID.");
+        }
 
         System.out.println("Enter product quantity: ");
         userData = MainMenu.SC.nextLine();
