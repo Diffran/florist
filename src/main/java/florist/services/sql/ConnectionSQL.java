@@ -333,6 +333,7 @@ public class ConnectionSQL {
             if (res.next()) {
                 return res.getDouble("total_value");
             } else {
+                System.out.println("There are no items in stock");
                 return 0.0;
             }
         } catch (SQLException e) {

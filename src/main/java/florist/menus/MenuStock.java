@@ -80,8 +80,10 @@ public class MenuStock {
             connectionSQL.addProductToFloristStock(quantity, productId, floristID);
 
 
-        } catch (SQLException | NumberFormatException e) {
+        } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
+        }catch (NumberFormatException e){
+            System.out.println("Error: enter a number - "+e.getMessage());
         }
 
     }
@@ -102,8 +104,10 @@ public class MenuStock {
             connectionSQL.returnQuantityToMainStock(floristID, productId, quantity);
             connectionSQL.disconnect();
 
-        } catch (SQLException | NumberFormatException e) {
+        } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
+        }catch (NumberFormatException e){
+            System.out.println("Error: enter a number - "+e.getMessage());
         }
     }
 
@@ -135,8 +139,10 @@ public class MenuStock {
 
             connectionSQL.disconnect();
 
-        } catch (SQLException|NumberFormatException e) {
+        } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
+        }catch(NumberFormatException e){
+            System.out.println("Error: enter a number - "+e.getMessage());
         }
     }
 

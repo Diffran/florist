@@ -27,8 +27,8 @@ public class MenuTicket {
                     default -> System.out.println("Invalid option. Please try again.");
                 }
 
-            } catch (Exception e) {
-                System.out.println("sha de canvia lexception");//borrar
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Invalid option. Please enter a number. "+ e.getMessage());
             }
 
         } while (optionTicket != 3);

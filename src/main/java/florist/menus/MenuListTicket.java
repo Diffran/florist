@@ -26,8 +26,8 @@ public class MenuListTicket {
                     default -> System.out.println("Invalid option. Please try again.");
                 }
 
-            } catch (Exception e) {
-                System.out.println("sha de canvia lexception ListTicket");//borrar
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Invalid option. Please enter a number. "+ e.getMessage());
             }
 
         } while (optionTicket != 2);
@@ -36,10 +36,10 @@ public class MenuListTicket {
     private static void handleMenu() {
         System.out.println("-------------TICKET OPTION---------------");
         System.out.println("1- SHOW INDIVIDUAL TICKET");
-        System.out.println("2- RETURN TO TICKET MENU");
+        System.out.println("2- EXIT");
     }
 
-    private static void showIndividualTicket(int floristId) {
+    private static void showIndividualTicket(int floristId) throws NumberFormatException{
         SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy", Locale.ENGLISH);
 
         System.out.println("Enter Ticket ID: ");
