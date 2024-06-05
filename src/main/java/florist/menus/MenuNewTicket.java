@@ -122,14 +122,16 @@ public class MenuNewTicket {
         userData = MainMenu.SC.nextLine();
         int productID = Integer.parseInt(userData);
 
-        if(productID<0){
+        if(productID < 0){
             throw new NotValidIDException("id invalid, please enter a valid ID.");
         }
 
         System.out.println("Enter product quantity: ");
         userData = MainMenu.SC.nextLine();
         int quantity = Integer.parseInt(userData);
-
+        if(quantity <= 0){
+            throw new NotValidIDException( quantity+ " is invalid, please enter a valid quantity.");
+        }
         if (ConnectionSQL.getInstance().isThereProduct(floristID, productID, quantity)) {
             PRODUCT_LIST.put(productID, quantity);
             System.out.println("Product added to ticket.");
