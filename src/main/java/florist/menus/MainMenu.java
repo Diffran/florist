@@ -1,6 +1,7 @@
 package florist.menus;
 
 import florist.exceptions.EmptyStringException;
+import florist.exceptions.NoConnectedDBException;
 import florist.services.sql.ConnectionSQL;
 import florist.exceptions.EmptySQLTableException;
 
@@ -13,7 +14,7 @@ public class MainMenu {
     public static final Scanner SC = new Scanner(System.in);
     public static ConnectionSQL connection;
 
-    public static void mainMenu() {
+    public static void mainMenu() throws NoConnectedDBException {
         connection = ConnectionSQL.getInstance();
         int option = 0;
 
@@ -79,23 +80,23 @@ public class MainMenu {
         }
     }
 
-    private static boolean checkingConnection() {
+    private static boolean checkingConnection() throws NoConnectedDBException {
         try {
             connection.connect();
             return true;
 
         } catch (SQLException e) {
-            System.out.println("**********************************************");
-            System.out.println("* Not connected to the Database.             *" +
-                    "\n*                                            *" +
-                    "\n* Please connect to the Database to continue *" +
-                    "\n* and restart the program again.             *");
-            System.out.println("**********************************************");
+            String msg = "**********************************************\n" +
+                    "*       Not connected to the Database.       *\n" +
+                    "*                                            *\n" +
+                    "* Please connect to the Database to continue *\n" +
+                    "* and restart the program again.             *\n" +
+                    "**********************************************";
+
+            throw new NoConnectedDBException(msg);
 
         } finally {
             connection.disconnect();
         }
-
-        return false;
     }
 }

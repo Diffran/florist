@@ -4,6 +4,7 @@ import florist.exceptions.EmptyStringException;
 import static florist.menus.option.AddProductOption.*;
 
 import florist.exceptions.InvalidDecorationType;
+import florist.exceptions.NoConnectedDBException;
 import florist.services.sql.ConnectionSQL;
 
 import java.sql.SQLException;
@@ -36,7 +37,7 @@ public class MenuAddProduct {
 
             } catch (NumberFormatException e) {
                 System.out.println(e.getMessage() + " Invalid input. Please enter a number.");
-            } catch (EmptyStringException | SQLException | InvalidDecorationType e) {
+            } catch (EmptyStringException | SQLException | InvalidDecorationType | NoConnectedDBException e) {
                 System.out.println(e.getMessage());
 
             } finally {
