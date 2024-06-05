@@ -53,7 +53,7 @@ public class ConnectionSQL {
         return connection;
     }
 
-    public void disconnect() {
+    public boolean disconnect() {
         if (connection != null) {
             try {
                 connection.close();
@@ -63,6 +63,7 @@ public class ConnectionSQL {
                 System.out.println("Error: " + e.getMessage());
             }
         }
+        return false;
     }
 
     public int createFlorist() throws EmptyStringException, EmptySQLTableException {

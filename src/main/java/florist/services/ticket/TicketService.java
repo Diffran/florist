@@ -71,6 +71,7 @@ public class TicketService {
 
                 Florist florist = new Florist();
                 florist.setName(res.getString("name"));
+                florist.setId(floristId);
                 ticket.setFlorist(florist);
 
                 HashMap<String, HashMap<String, Object>> productList = new HashMap<>();

@@ -2,12 +2,6 @@ package florist.menus;
 
 import florist.services.sql.ConnectionSQL;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
-
-
 import static florist.menus.option.MenuFloristOption.*;
 
 

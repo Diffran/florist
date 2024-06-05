@@ -17,6 +17,9 @@ public class MainMenu {
         connection = ConnectionSQL.getInstance();
         int option = 0;
 
+        if (!checkingConnection())
+            return;
+
         do {
             handleMenu();
 
@@ -44,10 +47,11 @@ public class MainMenu {
                     default -> System.out.println("Invalid option. Please try again.");
                 }
             } catch (NumberFormatException e) {
-                System.out.println(e.getMessage()+" Invalid input. Please enter a number.");
-            } catch (SQLException | EmptyStringException |EmptySQLTableException e) {
+                System.out.println(e.getMessage() + " Invalid input. Please enter a number.");
+            } catch (SQLException | EmptyStringException | EmptySQLTableException e) {
                 System.out.println("An error occurred: " + e.getMessage());
             }
+
         } while (option != 5);
     }
 
@@ -73,5 +77,25 @@ public class MainMenu {
         } else {
             System.out.println("Florist not found");
         }
+    }
+
+    private static boolean checkingConnection() {
+        try {
+            connection.connect();
+            return true;
+
+        } catch (SQLException e) {
+            System.out.println("**********************************************");
+            System.out.println("* Not connected to the Database.             *" +
+                    "\n*                                            *" +
+                    "\n* Please connect to the Database to continue *" +
+                    "\n* and restart the program again.             *");
+            System.out.println("**********************************************");
+
+        } finally {
+            connection.disconnect();
+        }
+
+        return false;
     }
 }
