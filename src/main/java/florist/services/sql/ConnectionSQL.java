@@ -10,6 +10,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ConnectionSQL {
     private Connection connection;
@@ -346,8 +347,9 @@ public class ConnectionSQL {
         }
     }
 
-    public void printIndividualStockList(int floristId) throws EmptySQLTableException{
+    public List<Integer> printIndividualStockList(int floristId) throws EmptySQLTableException{
         String query = QueriesSQL.printIndividualStockList;
+        List<Integer> idProducts = new ArrayList<>();
 
         try {
             stmt = getConnection().prepareStatement(query);
@@ -358,6 +360,8 @@ public class ConnectionSQL {
                 throw new EmptySQLTableException("Empty Stock");
             } else {
                 while (res.next()) {
+                    idProducts.add(res.getInt("id_product"));
+
                     System.out.println(
                             "Product ID: " + res.getInt("id_product") +
                                     " - Product: " + res.getString("name") +
@@ -369,11 +373,14 @@ public class ConnectionSQL {
                     );
                 }
             }
+
         } catch (SQLException e) {
             System.out.println("Error printing individual stock list: " + e.getMessage());
         } finally {
             disconnect();
         }
+
+        return idProducts;
     }
 
     public void printGlobalStockList(int floristId) throws SQLException, EmptySQLTableException {

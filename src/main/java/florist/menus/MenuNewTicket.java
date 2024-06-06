@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 public class MenuNewTicket {
     private static int floristID;
@@ -42,8 +43,8 @@ public class MenuNewTicket {
                 }
             } catch (NotValidIDException | EmptySQLTableException e) {
                 System.out.println("Error: " + e.getMessage());
-            }catch(NumberFormatException e){
-                System.out.println(e.getMessage()+ "Invalid input. Please enter a number.");
+            } catch (NumberFormatException e) {
+                System.out.println(e.getMessage() + "Invalid input. Please enter a number.");
             }
         } while (ticketOption != 4);
     }
@@ -117,21 +118,23 @@ public class MenuNewTicket {
     }
 
     private static void addProduct() throws EmptySQLTableException, NotValidIDException {
-        ConnectionSQL.getInstance().printIndividualStockList(floristID);
+        List<Integer> idProducts = ConnectionSQL.getInstance().printIndividualStockList(floristID);
+
         System.out.println("Enter product ID: ");
         userData = MainMenu.SC.nextLine();
         int productID = Integer.parseInt(userData);
 
-        if(productID < 0){
-            throw new NotValidIDException("id invalid, please enter a valid ID.");
-        }
+        if (!idProducts.contains(productID))
+            throw new NotValidIDException("ID " + productID + " is invalid, please enter a valid ID.");
 
         System.out.println("Enter product quantity: ");
         userData = MainMenu.SC.nextLine();
         int quantity = Integer.parseInt(userData);
-        if(quantity <= 0){
-            throw new NotValidIDException( quantity+ " is invalid, please enter a valid quantity.");
+
+        if (quantity <= 0) {
+            throw new NotValidIDException(quantity + " is invalid, please enter a valid quantity.");
         }
+
         if (ConnectionSQL.getInstance().isThereProduct(floristID, productID, quantity)) {
             PRODUCT_LIST.put(productID, quantity);
             System.out.println("Product added to ticket.");
