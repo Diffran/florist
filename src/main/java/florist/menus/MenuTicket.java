@@ -28,7 +28,7 @@ public class MenuTicket {
                 }
 
             } catch (NumberFormatException e) {
-                System.out.println("Error: Invalid option. Please enter a number. "+ e.getMessage());
+                System.out.println("Error: Invalid option. Please enter a number. " + e.getMessage());
             }
 
         } while (optionTicket != 3);
@@ -44,7 +44,7 @@ public class MenuTicket {
     private static void listTicket(int floristId) {
         List<Ticket> tickets = TicketService.listTicket(floristId);
 
-        if(tickets.isEmpty()) {
+        if (tickets.isEmpty()) {
             System.out.println("There are no tickets to show.");
             return;
         }
