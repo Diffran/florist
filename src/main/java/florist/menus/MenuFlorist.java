@@ -1,6 +1,6 @@
 package florist.menus;
 
-import florist.services.sql.ConnectionSQL;
+import florist.services.ticket.TicketService;
 
 import static florist.menus.option.MenuFloristOption.*;
 
@@ -20,8 +20,7 @@ public class MenuFlorist {
                     case STOCK -> MenuStock.stockMenu(florist);
                     case TICKET -> MenuTicket.ticketMenu(florist);
                     case TOTAL_SALES -> {
-                        ConnectionSQL connectionSQL = ConnectionSQL.getInstance();
-                        double totalSales = connectionSQL.listTotalTickets(florist);
+                        double totalSales = TicketService.listTotalTickets(florist);
                         System.out.println("Total sales: " + totalSales + "€");
                     }
                     case EXIT_FLORIST -> MainMenu.mainMenu();

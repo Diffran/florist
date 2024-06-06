@@ -9,6 +9,7 @@ import florist.exceptions.NotValidIDException;
 import florist.models.Florist;
 import florist.models.Ticket;
 import florist.services.sql.ConnectionSQL;
+import florist.services.ticket.TicketService;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -88,7 +89,7 @@ public class MenuNewTicket {
             int productId = entry.getKey();
             int quantity = entry.getValue();
             String productName = ConnectionSQL.getInstance().getProductName(productId);
-            double productPrice = ConnectionSQL.getInstance().getProductPrice(productId);
+            double productPrice = TicketService.getProductPrice(productId);
             HashMap<String, Object> productDetails = new HashMap<>();
 
             productDetails.put("name", productName);
@@ -147,7 +148,7 @@ public class MenuNewTicket {
         if (isListEmpty())
             return;
 
-        ConnectionSQL.getInstance().completeTicket(floristId, PRODUCT_LIST);
+        TicketService.completeTicket(floristId, PRODUCT_LIST);
         System.out.println("Ticket completed and stock updated.");
 
         PRODUCT_LIST.clear();
@@ -160,7 +161,7 @@ public class MenuNewTicket {
     }
 
     private static int generateTicketId() {
-        return ConnectionSQL.getInstance().countTickets() + 1;
+        return TicketService.countTickets() + 1;
     }
 
     private static Florist getFlorist(int floristID) throws SQLException {
