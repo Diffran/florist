@@ -2,8 +2,9 @@ package florist.menus;
 
 import florist.exceptions.EmptyStringException;
 import florist.exceptions.NoConnectedDBException;
-import florist.services.sql.ConnectionSQL;
+import florist.services.florist.FloristService;
 import florist.exceptions.EmptySQLTableException;
+import florist.services.stock.StockService;
 
 import java.sql.SQLException;
 import java.util.Scanner;
@@ -12,13 +13,11 @@ import static florist.menus.option.MainMenuOption.*;
 
 public class MainMenu {
     public static final Scanner SC = new Scanner(System.in);
-    public static ConnectionSQL connection;
 
     public static void mainMenu() throws NoConnectedDBException {
-        connection = ConnectionSQL.getInstance();
         int option = 0;
 
-        if (!checkingConnection())
+        if (!FloristService.checkingConnection())
             return;
 
         do {
@@ -28,27 +27,17 @@ public class MainMenu {
                 option = Integer.parseInt(SC.nextLine().trim());
 
                 switch (option) {
-                    case CREATE_NEW_FLORIST -> connection.createNewStock(connection.createFlorist());
-                    case LOAD_FLORIST -> {
-                        connection.printFlorist();
-                        loadMenuFlorist();
-                    }
-                    case DELETE_FLORIST -> {
-                        connection.printFlorist();
-                        connection.deleteFlorist();
-                    }
-                    case ADD_NEW_PRODUCT -> {
-                        System.out.println("Add a new product to general stock");
-                        MenuAddProduct.menuAddProduct();
-                    }
-                    case EXIT -> {
-                        SC.close();
-                        System.exit(0);
-                    }
+                    case CREATE_NEW_FLORIST -> StockService.createNewStock(FloristService.createFlorist());
+                    case LOAD_FLORIST -> loadMenuFlorist();
+                    case DELETE_FLORIST -> deleteFlorist();
+                    case ADD_NEW_PRODUCT -> addNewProduct();
+                    case EXIT -> exit();
                     default -> System.out.println("Invalid option. Please try again.");
                 }
+
             } catch (NumberFormatException e) {
                 System.out.println(e.getMessage() + " Invalid input. Please enter a number.");
+
             } catch (SQLException | EmptyStringException | EmptySQLTableException e) {
                 System.out.println("An error occurred: " + e.getMessage());
             }
@@ -66,6 +55,8 @@ public class MainMenu {
     }
 
     private static void loadMenuFlorist() throws NumberFormatException, EmptySQLTableException, SQLException {
+        FloristService.printFlorist();
+
         int id;
         String userData;
 
@@ -73,30 +64,26 @@ public class MainMenu {
         userData = SC.nextLine().trim();
         id = Integer.parseInt(userData);
 
-        if (connection.floristExist(id)) {
+        if (FloristService.floristExist(id)) {
             MenuFlorist.menuFlorist(id);
+
         } else {
             System.out.println("Florist not found");
         }
     }
 
-    private static boolean checkingConnection() throws NoConnectedDBException {
-        try {
-            connection.connect();
-            return true;
+    private static void deleteFlorist() {
+        FloristService.printFlorist();
+        FloristService.deleteFlorist();
+    }
 
-        } catch (SQLException e) {
-            String msg = "**********************************************\n" +
-                    "*       Not connected to the Database.       *\n" +
-                    "*                                            *\n" +
-                    "* Please connect to the Database to continue *\n" +
-                    "* and restart the program again.             *\n" +
-                    "**********************************************";
+    private static void addNewProduct() {
+        System.out.println("Add a new product to general stock");
+        MenuAddProduct.menuAddProduct();
+    }
 
-            throw new NoConnectedDBException(msg);
-
-        } finally {
-            connection.disconnect();
-        }
+    private static void exit() {
+        SC.close();
+        System.exit(0);
     }
 }

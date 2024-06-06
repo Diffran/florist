@@ -65,68 +65,11 @@ public class ConnectionSQL {
         return false;
     }
 
-    public int createFlorist() throws EmptyStringException, EmptySQLTableException {
-        try {
-            stmt = getConnection().prepareStatement(QueriesSQL.createNewFlorist);
 
-            System.out.println("Enter Florist name: ");
-            userData = MainMenu.SC.nextLine();
 
-            if (!userData.isEmpty()) {
-                stmt.setString(1, userData);
-                stmt.executeUpdate();
-                System.out.println("florist: " + userData + " added to the database");
-            } else {
-                throw new EmptyStringException("at create Florist");
-            }
-            stmt = getConnection().prepareStatement(QueriesSQL.selectFloristID);
-            stmt.setString(1,userData);
 
-            res = stmt.executeQuery();
 
-            while (res.next()) {
-                return res.getInt("id_florist");
-            }
 
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        } finally {
-            disconnect();
-        }
-        return 0;
-    }
-
-    public void printFlorist() {
-        try {
-            getConnection();
-            st = connection.createStatement();
-            res = st.executeQuery(QueriesSQL.printFlorist);
-
-            while (res.next()) {
-                System.out.println("ID: " + res.getInt("id_florist") + " - NAME: " + res.getString("name"));
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        } finally {
-            disconnect();
-        }
-    }
-
-    public boolean floristExist(int id) throws EmptySQLTableException, SQLException {
-        try {
-            stmt = getConnection().prepareStatement(QueriesSQL.floristExists);
-            stmt.setInt(1, id);
-            res = stmt.executeQuery();
-
-            if (res.next()) {
-                return true;
-            } else {
-                throw new EmptySQLTableException("florist with id: " + id);
-            }
-        } finally {
-            disconnect();
-        }
-    }
 
     public String getFloristName(int floristId) throws SQLException {
         String floristName = null;
@@ -144,25 +87,7 @@ public class ConnectionSQL {
         return floristName;
     }
 
-    public void deleteFlorist() throws NumberFormatException {
-        int id;
-        System.out.println("Please enter the ID of the florist you'd like to remove:");
-        userData = MainMenu.SC.nextLine();
-        id = Integer.parseInt(userData);
 
-        try {
-            if (floristExist(id)) {
-                stmt = getConnection().prepareStatement(QueriesSQL.deleteFlorist);
-                stmt.setInt(1, id);
-                stmt.executeUpdate();
-                System.out.println("florist id: " + id + " successfully deleted");
-            }
-        } catch (SQLException | EmptySQLTableException e) {
-            System.out.println(e.getMessage());
-        } finally {
-            disconnect();
-        }
-    }
 
     public void addTree() throws SQLException, EmptyStringException {
         try {
@@ -389,21 +314,6 @@ public class ConnectionSQL {
 
 
 
-    public void createNewStock(int floristID){
-        try {
-            stmt = getConnection().prepareStatement(QueriesSQL.createNewStock);
 
-            stmt.setInt(1, floristID);
-            stmt.executeUpdate();
-
-            System.out.println("stock initialized");
-
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        } finally {
-            disconnect();
-        }
-
-    }
 
 }

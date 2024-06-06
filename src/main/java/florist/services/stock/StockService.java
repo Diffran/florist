@@ -16,6 +16,23 @@ public class StockService {
     public static PreparedStatement stmt;
     public static ResultSet res;
 
+    public static void createNewStock(int floristID){
+        try {
+            stmt = CONNECTION.getConnection().prepareStatement(QueriesSQL.createNewStock);
+
+            stmt.setInt(1, floristID);
+            stmt.executeUpdate();
+
+            System.out.println("stock initialized");
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            CONNECTION.disconnect();
+        }
+
+    }
+
     public static List<String> listAllProduct() throws SQLException {
         List<String> products = new ArrayList<>();
         String query = QueriesSQL.listAllProduct;
