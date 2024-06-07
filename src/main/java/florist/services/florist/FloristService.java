@@ -47,23 +47,26 @@ public class FloristService {
                 stmt.setString(1, userData);
                 stmt.executeUpdate();
                 System.out.println("florist: " + userData + " added to the database");
-            } else {
+            } else
                 throw new EmptyStringException("at create Florist");
-            }
+
+
             stmt = CONNECTION.getConnection().prepareStatement(QueriesSQL.selectFloristID);
             stmt.setString(1, userData);
 
             res = stmt.executeQuery();
 
-            while (res.next()) {
+            while (res.next())
                 return res.getInt("id_florist");
-            }
+
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+
         } finally {
             CONNECTION.disconnect();
         }
+
         return 0;
     }
 
@@ -73,11 +76,13 @@ public class FloristService {
             Statement st = connection.createStatement();
             res = st.executeQuery(QueriesSQL.printFlorist);
 
-            while (res.next()) {
+            while (res.next())
                 System.out.println("ID: " + res.getInt("id_florist") + " - NAME: " + res.getString("name"));
-            }
+
+
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+
         } finally {
             CONNECTION.disconnect();
         }
@@ -89,11 +94,11 @@ public class FloristService {
             stmt.setInt(1, id);
             res = stmt.executeQuery();
 
-            if (res.next()) {
+            if (res.next())
                 return true;
-            } else {
+            else
                 throw new EmptySQLTableException("florist with id: " + id);
-            }
+
         } finally {
             CONNECTION.disconnect();
         }
@@ -112,10 +117,30 @@ public class FloristService {
                 stmt.executeUpdate();
                 System.out.println("florist id: " + id + " successfully deleted");
             }
+
         } catch (SQLException | EmptySQLTableException e) {
             System.out.println(e.getMessage());
+
         } finally {
             CONNECTION.disconnect();
         }
+    }
+
+    public static String getFloristName(int floristId) throws SQLException {
+        String floristName = null;
+
+        try {
+            stmt = CONNECTION.getConnection().prepareStatement(QueriesSQL.floristExists);
+            stmt.setInt(1, floristId);
+            res = stmt.executeQuery();
+
+            if (res.next())
+                floristName = res.getString("name");
+
+        } finally {
+            CONNECTION.disconnect();
+        }
+
+        return floristName;
     }
 }

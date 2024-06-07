@@ -8,7 +8,9 @@ import florist.exceptions.EmptySQLTableException;
 import florist.exceptions.NotValidIDException;
 import florist.models.Florist;
 import florist.models.Ticket;
-import florist.services.sql.ConnectionSQL;
+import florist.services.florist.FloristService;
+import florist.services.product.ProductService;
+import florist.services.stock.StockService;
 import florist.services.ticket.TicketService;
 
 import java.io.File;
@@ -42,11 +44,14 @@ public class MenuNewTicket {
                     case EXIT_NEW_TICKET -> MenuTicket.ticketMenu(floristID);
                     default -> System.out.println("Invalid option. Please try again.");
                 }
+
             } catch (NotValidIDException | EmptySQLTableException e) {
                 System.out.println("Error: " + e.getMessage());
+
             } catch (NumberFormatException e) {
                 System.out.println(e.getMessage() + "Invalid input. Please enter a number.");
             }
+
         } while (ticketOption != 4);
     }
 
@@ -70,9 +75,10 @@ public class MenuNewTicket {
                 System.out.println("Error printing ticket: " + e.getMessage());
                 return false;
             }
-        } else {
+
+        } else
             return false;
-        }
+
     }
 
     private static void printTicket(int floristID) throws IOException, SQLException {
@@ -88,7 +94,7 @@ public class MenuNewTicket {
         for (HashMap.Entry<Integer, Integer> entry : PRODUCT_LIST.entrySet()) {
             int productId = entry.getKey();
             int quantity = entry.getValue();
-            String productName = ConnectionSQL.getInstance().getProductName(productId);
+            String productName = ProductService.getProductName(productId);
             double productPrice = TicketService.getProductPrice(productId);
             HashMap<String, Object> productDetails = new HashMap<>();
 
@@ -107,9 +113,8 @@ public class MenuNewTicket {
         String dateFolderName = dateFormat.format(new Date());
 
         File directory = new File("tickets/" + dateFolderName);
-        if (!directory.exists()) {
+        if (!directory.exists())
             directory.mkdirs();
-        }
 
         try (FileWriter writer = new FileWriter(directory + "/ticket_" + ticket.getId() + ".json")) {
             writer.write(json);
@@ -119,7 +124,7 @@ public class MenuNewTicket {
     }
 
     private static void addProduct() throws EmptySQLTableException, NotValidIDException {
-        List<Integer> idProducts = ConnectionSQL.getInstance().printIndividualStockList(floristID);
+        List<Integer> idProducts = StockService.printIndividualStockList(floristID);
 
         System.out.println("Enter product ID: ");
         userData = MainMenu.SC.nextLine();
@@ -132,16 +137,15 @@ public class MenuNewTicket {
         userData = MainMenu.SC.nextLine();
         int quantity = Integer.parseInt(userData);
 
-        if (quantity <= 0) {
+        if (quantity <= 0)
             throw new NotValidIDException(quantity + " is invalid, please enter a valid quantity.");
-        }
 
-        if (ConnectionSQL.getInstance().isThereProduct(floristID, productID, quantity)) {
+        if (StockService.isThereProduct(floristID, productID, quantity)) {
             PRODUCT_LIST.put(productID, quantity);
             System.out.println("Product added to ticket.");
-        } else {
+        } else
             System.out.println("Insufficient stock.");
-        }
+
     }
 
     private static void completeTicket(int floristId) {
@@ -153,9 +157,8 @@ public class MenuNewTicket {
 
         PRODUCT_LIST.clear();
 
-        if (printTicketMenu()) {
+        if (printTicketMenu())
             System.out.println("Printed ticket in JSON.");
-        }
 
         MenuTicket.ticketMenu(floristID);
     }
@@ -165,7 +168,7 @@ public class MenuNewTicket {
     }
 
     private static Florist getFlorist(int floristID) throws SQLException {
-        String floristName = ConnectionSQL.getInstance().getFloristName(floristID);
+        String floristName = FloristService.getFloristName(floristID);
 
         Florist florist = new Florist();
         florist.setId(floristID);
@@ -183,7 +186,7 @@ public class MenuNewTicket {
         for (HashMap.Entry<Integer, Integer> entry : PRODUCT_LIST.entrySet()) {
             int productId = entry.getKey();
             int quantity = entry.getValue();
-            String productName = ConnectionSQL.getInstance().getProductName(productId);
+            String productName = ProductService.getProductName(productId);
             System.out.println("Product ID: " + productId + ", Name: " + productName + ", Quantity: " + quantity);
         }
     }
