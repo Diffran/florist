@@ -55,10 +55,10 @@ public class MenuListTicket {
             System.out.println("Florist Name: " + ticket.getFlorist().getName());
 
             HashMap<String, HashMap<String, Object>> productList = ticket.getProductList();
-            if (productList.isEmpty()) {
-                System.out.println("No products in this ticket.");
-            } else {
+            if (productList.isEmpty()) System.out.println("No products in this ticket.");
+            else {
                 System.out.println("Products:");
+
                 for (Map.Entry<String, HashMap<String, Object>> entry : productList.entrySet()) {
                     String productId = entry.getKey();
                     HashMap<String, Object> details = entry.getValue();
@@ -71,6 +71,7 @@ public class MenuListTicket {
 
             System.out.println("Total: " + ticket.getTotalPrice() + "€");
             System.out.println("**********************************\n");
+
         } else {
             System.out.println("Ticket not found.");
             showIndividualTicket(floristId);

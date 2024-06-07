@@ -44,6 +44,7 @@ public class TicketService {
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+
         } finally {
             CONNECTION.disconnect();
         }
@@ -68,7 +69,6 @@ public class TicketService {
                 ticket = new Ticket();
                 ticket.setId(res.getInt("id_ticket"));
                 ticket.setDate(res.getDate("date"));
-                //ticket.setTotalPrice(res.getDouble("total_price"));
 
                 Florist florist = new Florist();
                 florist.setName(res.getString("name"));
@@ -93,20 +93,19 @@ public class TicketService {
                     productParams.put("price", price);
 
                     switch (productType) {
-                        case "tree":
+                        case "tree" -> {
                             double height = productRes.getDouble("height");
                             productParams.put("height", height);
-                            break;
-                        case "flower":
+                        }
+                        case "flower" -> {
                             String color = productRes.getString("color");
                             productParams.put("color", color);
-                            break;
-                        case "decoration":
+                        }
+                        case "decoration" -> {
                             String materialType = productRes.getString("material_type");
                             productParams.put("material", MaterialDecorationType.valueOf(materialType.toUpperCase()));
-                            break;
-                        default:
-                            System.out.println("Opps");
+                        }
+                        default -> System.out.println("Opps");
                     }
 
                     Product product = productFactory.createProduct(productType, productParams);
@@ -119,11 +118,13 @@ public class TicketService {
                     productDetails.put("price", price);
                     productList.put(String.valueOf(productId), productDetails);
                 }
+
                 ticket.setProductList(productList);
             }
 
         } catch (SQLException e) {
             System.out.println("Error fetching ticket details: " + e.getMessage());
+
         } finally {
             CONNECTION.disconnect();
         }
@@ -170,9 +171,8 @@ public class TicketService {
             res = stmt.getGeneratedKeys();
             int ticketId = 0;
 
-            if (res.next()) {
-                ticketId = res.getInt(1);
-            }
+            if (res.next()) ticketId = res.getInt(1);
+
 
             for (HashMap.Entry<Integer, Integer> entry : productList.entrySet()) {
                 int productId = entry.getKey();
@@ -192,12 +192,15 @@ public class TicketService {
                 insertStmt.setInt(3, productId);
                 insertStmt.executeUpdate();
             }
+
         } catch (SQLException e) {
             System.out.println("Error completing ticket: " + e.getMessage());
+
         } finally {
             CONNECTION.disconnect();
         }
     }
+
     public static int countTickets() {
         int count = 0;
 
@@ -207,11 +210,11 @@ public class TicketService {
             Statement countStmt = connection.createStatement();
             ResultSet rs = countStmt.executeQuery(query);
 
-            if (rs.next()) {
-                count = rs.getInt("total");
-            }
+            if (rs.next()) count = rs.getInt("total");
+
         } catch (SQLException e) {
             System.out.println("Error counting tickets: " + e.getMessage());
+
         } finally {
             CONNECTION.disconnect();
         }
@@ -228,11 +231,11 @@ public class TicketService {
             priceStmt.setInt(1, productId);
             ResultSet priceRes = priceStmt.executeQuery();
 
-            if (priceRes.next()) {
-                price = priceRes.getDouble("price");
-            }
+            if (priceRes.next()) price = priceRes.getDouble("price");
+
         } catch (SQLException e) {
             System.out.println("Error fetching product price: " + e.getMessage());
+
         } finally {
             CONNECTION.disconnect();
         }
@@ -247,9 +250,8 @@ public class TicketService {
         try (PreparedStatement stmt = CONNECTION.getConnection().prepareStatement(query)) {
             stmt.setInt(1, id_florist);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    totalSales = rs.getDouble(1);
-                }
+                if (rs.next()) totalSales = rs.getDouble(1);
+
             }
         } catch (SQLException e) {
             System.out.println("Error calculating tickets total value: " + e.getMessage());

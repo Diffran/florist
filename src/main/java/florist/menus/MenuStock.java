@@ -79,9 +79,8 @@ public class MenuStock {
             List<String> products = StockService.listAllProduct();
 
             System.out.println("All Products:");
-            for (String product : products) {
-                System.out.println(product);
-            }
+            for (String product : products) System.out.println(product);
+
 
         } catch (SQLException e) {
             System.out.println("Error listing products: " + e.getMessage());
@@ -96,9 +95,8 @@ public class MenuStock {
             System.out.println("Enter product ID to add: ");
             int productId = Integer.parseInt(MainMenu.SC.nextLine());
 
-            if (productId < 0) {
-                throw new NotValidIDException("id invalid, please enter a valid ID.");
-            }
+            if (productId < 0) throw new NotValidIDException("id invalid, please enter a valid ID.");
+
             System.out.println("Enter quantity to add: ");
             int quantity = Integer.parseInt(MainMenu.SC.nextLine());
 
@@ -106,6 +104,7 @@ public class MenuStock {
 
         } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
+
         } catch (NumberFormatException e) {
             System.out.println("Error: enter a number - " + e.getMessage());
         }
@@ -119,9 +118,8 @@ public class MenuStock {
             System.out.println("Enter product ID: ");
             int productId = Integer.parseInt(MainMenu.SC.nextLine());
 
-            if (productId < 0) {
-                throw new NotValidIDException("id invalid, please enter a valid ID.");
-            }
+            if (productId < 0) throw new NotValidIDException("id invalid, please enter a valid ID.");
+
             System.out.println("Enter quantity to update: ");
             int quantity = Integer.parseInt(MainMenu.SC.nextLine());
 
@@ -129,6 +127,7 @@ public class MenuStock {
 
         } catch (SQLException | NotValidIDException e) {
             System.out.println("Error: " + e.getMessage());
+
         } catch (NumberFormatException e) {
             System.out.println("Error: enter a number - " + e.getMessage());
         }
@@ -145,6 +144,7 @@ public class MenuStock {
 
         } catch (NumberFormatException e) {
             System.out.println("Error: enter a number - " + e.getMessage());
+
         } catch (NotValidIDException e) {
             System.out.println("id invalid, please enter a valid ID.");
         }

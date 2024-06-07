@@ -76,8 +76,7 @@ public class MenuNewTicket {
                 return false;
             }
 
-        } else
-            return false;
+        } else return false;
 
     }
 
@@ -113,8 +112,7 @@ public class MenuNewTicket {
         String dateFolderName = dateFormat.format(new Date());
 
         File directory = new File("tickets/" + dateFolderName);
-        if (!directory.exists())
-            directory.mkdirs();
+        if (!directory.exists()) directory.mkdirs();
 
         try (FileWriter writer = new FileWriter(directory + "/ticket_" + ticket.getId() + ".json")) {
             writer.write(json);
@@ -143,8 +141,8 @@ public class MenuNewTicket {
         if (StockService.isThereProduct(floristID, productID, quantity)) {
             PRODUCT_LIST.put(productID, quantity);
             System.out.println("Product added to ticket.");
-        } else
-            System.out.println("Insufficient stock.");
+
+        } else System.out.println("Insufficient stock.");
 
     }
 
@@ -157,8 +155,7 @@ public class MenuNewTicket {
 
         PRODUCT_LIST.clear();
 
-        if (printTicketMenu())
-            System.out.println("Printed ticket in JSON.");
+        if (printTicketMenu()) System.out.println("Printed ticket in JSON.");
 
         MenuTicket.ticketMenu(floristID);
     }
@@ -178,8 +175,7 @@ public class MenuNewTicket {
     }
 
     private static void listTicketProducts() {
-        if (isListEmpty())
-            return;
+        if (isListEmpty()) return;
 
         System.out.println("Products in the ticket:");
 

@@ -50,6 +50,7 @@ public class StockService {
                         (res.getString("height") != null ? ", Height: " + res.getString("height") : "") +
                         (res.getString("material_type") != null ? ", Material Type: " + res.getString("material_type") : "") +
                         ", Quantity: " + res.getInt("quantity");
+
                 products.add(productDetails);
             }
 
@@ -356,6 +357,7 @@ public class StockService {
             if (res.next()) {
                 int availableQuantity = res.getInt("quantity");
                 return availableQuantity >= quantity;
+
             } else throw new NotValidIDException("id invalid, please enter a valid ID.");
 
         } catch (SQLException e) {

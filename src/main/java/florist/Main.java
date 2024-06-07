@@ -7,6 +7,7 @@ public class Main {
     public static void main(String[] args) throws NoConnectedDBException {
         try {
             MainMenu.mainMenu();
+
         } catch (NoConnectedDBException e) {
             System.out.println(e.getMessage());
         }

@@ -47,8 +47,7 @@ public class FloristService {
                 stmt.setString(1, userData);
                 stmt.executeUpdate();
                 System.out.println("florist: " + userData + " added to the database");
-            } else
-                throw new EmptyStringException("at create Florist");
+            } else throw new EmptyStringException("at create Florist");
 
 
             stmt = CONNECTION.getConnection().prepareStatement(QueriesSQL.selectFloristID);
@@ -56,8 +55,7 @@ public class FloristService {
 
             res = stmt.executeQuery();
 
-            while (res.next())
-                return res.getInt("id_florist");
+            while (res.next()) return res.getInt("id_florist");
 
 
         } catch (SQLException e) {
@@ -94,10 +92,8 @@ public class FloristService {
             stmt.setInt(1, id);
             res = stmt.executeQuery();
 
-            if (res.next())
-                return true;
-            else
-                throw new EmptySQLTableException("florist with id: " + id);
+            if (res.next()) return true;
+            else throw new EmptySQLTableException("florist with id: " + id);
 
         } finally {
             CONNECTION.disconnect();
@@ -134,8 +130,7 @@ public class FloristService {
             stmt.setInt(1, floristId);
             res = stmt.executeQuery();
 
-            if (res.next())
-                floristName = res.getString("name");
+            if (res.next()) floristName = res.getString("name");
 
         } finally {
             CONNECTION.disconnect();

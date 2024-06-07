@@ -5,19 +5,14 @@ import florist.models.Florist;
 import java.io.*;
 
 public class PersistenceJson {
-    /*
-    TODO:21 -> comprovar que funciona el JSon, con el ticket. NO HACER HASTA QUE SE HAYA HECHO
-        LA CREACION DEL TICKET! 
-     */
     private static PersistenceJson instance;
-    private String file = "florist.txt";
+    private final String file = "florist.txt";
 
     private PersistenceJson() {}
 
     public static PersistenceJson getInstance() {
-        if (instance == null) {
-            instance = new PersistenceJson();
-        }
+        if (instance == null) instance = new PersistenceJson();
+
         return instance;
     }
 
@@ -25,7 +20,7 @@ public class PersistenceJson {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
             oos.writeObject(florist);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Error: " + e);
         }
     }
 
@@ -33,7 +28,8 @@ public class PersistenceJson {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
             return (Florist) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            System.out.println("Error: " + e);
+
             return null;
         }
     }

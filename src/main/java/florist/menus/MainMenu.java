@@ -17,8 +17,7 @@ public class MainMenu {
     public static void mainMenu() throws NoConnectedDBException {
         int option = 0;
 
-        if (!FloristService.checkingConnection())
-            return;
+        if (!FloristService.checkingConnection()) return;
 
         do {
             handleMenu();
@@ -64,12 +63,9 @@ public class MainMenu {
         userData = SC.nextLine().trim();
         id = Integer.parseInt(userData);
 
-        if (FloristService.floristExist(id)) {
-            MenuFlorist.menuFlorist(id);
+        if (FloristService.floristExist(id)) MenuFlorist.menuFlorist(id);
+        else System.out.println("Florist not found");
 
-        } else {
-            System.out.println("Florist not found");
-        }
     }
 
     private static void deleteFlorist() {

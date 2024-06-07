@@ -36,8 +36,7 @@ public class ConnectionSQL {
     }
 
     public Connection getConnection() throws SQLException {
-        if (connection == null || connection.isClosed())
-            connect();
+        if (connection == null || connection.isClosed()) connect();
 
         return connection;
     }

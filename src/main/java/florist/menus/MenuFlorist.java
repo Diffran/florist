@@ -19,13 +19,11 @@ public class MenuFlorist {
                 switch (optionFlorist) {
                     case STOCK -> MenuStock.stockMenu(florist);
                     case TICKET -> MenuTicket.ticketMenu(florist);
-                    case TOTAL_SALES -> {
-                        double totalSales = TicketService.listTotalTickets(florist);
-                        System.out.println("Total sales: " + totalSales + "€");
-                    }
+                    case TOTAL_SALES -> totalSales(florist);
                     case EXIT_FLORIST -> MainMenu.mainMenu();
                     default -> System.out.println("Invalid option. Please try again.");
                 }
+
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input. Please enter a number.");
                 optionFlorist = -1;
@@ -42,6 +40,11 @@ public class MenuFlorist {
         System.out.println("2- TICKET");
         System.out.println("3- TOTAL SALES");
         System.out.println("4- EXIT");
+    }
+
+    private static void totalSales(int florist) {
+        double totalSales = TicketService.listTotalTickets(florist);
+        System.out.println("Total sales: " + totalSales + "€");
     }
 }
 
