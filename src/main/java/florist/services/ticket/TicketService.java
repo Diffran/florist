@@ -15,17 +15,14 @@ import java.util.Map;
 
 public class TicketService {
     private static final ConnectionSQL CONNECTION = ConnectionSQL.getInstance();
-    public static ResultSet res;
-    public static PreparedStatement stmt;
     private static Connection connection;
 
     public static List<Ticket> listTicket(int floristID) {
         List<Ticket> tickets = new ArrayList<>();
 
         try {
-            CONNECTION.connect();
-
-            PreparedStatement stmt = CONNECTION.getConnection().prepareStatement(QueriesSQL.printAllTickets);
+            connection = CONNECTION.getConnection();
+            PreparedStatement stmt = connection.prepareStatement(QueriesSQL.printAllTickets);
             stmt.setInt(1, floristID);
             ResultSet res = stmt.executeQuery();
 
@@ -56,11 +53,9 @@ public class TicketService {
         Ticket ticket = null;
 
         try {
-            CONNECTION.connect();
-
+            connection = CONNECTION.getConnection();
             String query = QueriesSQL.printIndividualTicket;
-
-            PreparedStatement stmt = CONNECTION.getConnection().prepareStatement(query);
+            PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setInt(1, ticketId);
             stmt.setInt(2, floristId);
             ResultSet res = stmt.executeQuery();
@@ -77,7 +72,7 @@ public class TicketService {
 
                 HashMap<String, HashMap<String, Object>> productList = new HashMap<>();
                 String productQuery = QueriesSQL.printProductToIndividualTicket;
-                PreparedStatement productStmt = CONNECTION.getConnection().prepareStatement(productQuery);
+                PreparedStatement productStmt = connection.prepareStatement(productQuery);
                 productStmt.setInt(1, ticketId);
                 ResultSet productRes = productStmt.executeQuery();
 
@@ -105,7 +100,7 @@ public class TicketService {
                             String materialType = productRes.getString("material_type");
                             productParams.put("material", MaterialDecorationType.valueOf(materialType.toUpperCase()));
                         }
-                        default -> System.out.println("Opps");
+                        default -> System.out.println("Oops");
                     }
 
                     Product product = productFactory.createProduct(productType, productParams);
@@ -136,14 +131,15 @@ public class TicketService {
         double totalPrice = 0.0;
 
         try {
-            for (HashMap.Entry<Integer, Integer> entry : productList.entrySet()) {
+            connection = CONNECTION.getConnection();
+            for (Map.Entry<Integer, Integer> entry : productList.entrySet()) {
                 int productId = entry.getKey();
                 int quantity = entry.getValue();
 
                 String calcTotPrice = QueriesSQL.getProductPrice;
-                PreparedStatement priceStmt = CONNECTION.getConnection().prepareStatement(calcTotPrice);
+                PreparedStatement priceStmt = connection.prepareStatement(calcTotPrice);
                 priceStmt.setInt(1, productId);
-                res = priceStmt.executeQuery();
+                ResultSet res = priceStmt.executeQuery();
 
                 if (res.next()) {
                     double price = res.getDouble("price");
@@ -152,8 +148,6 @@ public class TicketService {
             }
         } catch (SQLException e) {
             System.out.println("Error calculating total price: " + e.getMessage());
-        } finally {
-            CONNECTION.disconnect();
         }
 
         return totalPrice;
@@ -161,32 +155,32 @@ public class TicketService {
 
     public static void completeTicket(int floristId, HashMap<Integer, Integer> productList) {
         try {
+            connection = CONNECTION.getConnection();
             String insertTicket = QueriesSQL.insertTicket;
             double totalPrice = calculateTotalPrice(productList);
-            stmt = CONNECTION.getConnection().prepareStatement(insertTicket, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement stmt = connection.prepareStatement(insertTicket, Statement.RETURN_GENERATED_KEYS);
             stmt.setDouble(1, totalPrice);
             stmt.setInt(2, floristId);
             stmt.executeUpdate();
 
-            res = stmt.getGeneratedKeys();
+            ResultSet res = stmt.getGeneratedKeys();
             int ticketId = 0;
 
             if (res.next()) ticketId = res.getInt(1);
 
-
-            for (HashMap.Entry<Integer, Integer> entry : productList.entrySet()) {
+            for (Map.Entry<Integer, Integer> entry : productList.entrySet()) {
                 int productId = entry.getKey();
                 int quantity = entry.getValue();
 
                 String updateStock = QueriesSQL.updateStock;
-                PreparedStatement updateStmt = CONNECTION.getConnection().prepareStatement(updateStock);
+                PreparedStatement updateStmt = connection.prepareStatement(updateStock);
                 updateStmt.setInt(1, quantity);
                 updateStmt.setInt(2, floristId);
                 updateStmt.setInt(3, productId);
                 updateStmt.executeUpdate();
 
                 String insertProductTicket = QueriesSQL.insertProductTicket;
-                PreparedStatement insertStmt = CONNECTION.getConnection().prepareStatement(insertProductTicket);
+                PreparedStatement insertStmt = connection.prepareStatement(insertProductTicket);
                 insertStmt.setInt(1, quantity);
                 insertStmt.setInt(2, ticketId);
                 insertStmt.setInt(3, productId);
@@ -205,7 +199,7 @@ public class TicketService {
         int count = 0;
 
         try {
-            CONNECTION.connect();
+            connection = CONNECTION.getConnection();
             String query = QueriesSQL.countTickets;
             Statement countStmt = connection.createStatement();
             ResultSet rs = countStmt.executeQuery(query);
@@ -226,8 +220,9 @@ public class TicketService {
         double price = 0.0;
 
         try {
+            connection = CONNECTION.getConnection();
             String query = QueriesSQL.getProductPrice;
-            PreparedStatement priceStmt = CONNECTION.getConnection().prepareStatement(query);
+            PreparedStatement priceStmt = connection.prepareStatement(query);
             priceStmt.setInt(1, productId);
             ResultSet priceRes = priceStmt.executeQuery();
 
@@ -247,19 +242,21 @@ public class TicketService {
         double totalSales = 0;
         String query = QueriesSQL.totalTickets;
 
-        try (PreparedStatement stmt = CONNECTION.getConnection().prepareStatement(query)) {
+        try {
+            connection = CONNECTION.getConnection();
+            PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setInt(1, id_florist);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) totalSales = rs.getDouble(1);
+            ResultSet rs = stmt.executeQuery();
 
-            }
+            if (rs.next()) totalSales = rs.getDouble(1);
+
         } catch (SQLException e) {
             System.out.println("Error calculating tickets total value: " + e.getMessage());
+
         } finally {
             CONNECTION.disconnect();
         }
 
         return totalSales;
     }
-
 }

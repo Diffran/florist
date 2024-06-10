@@ -20,7 +20,6 @@ public class FloristService {
         try {
             CONNECTION.connect();
             return true;
-
         } catch (SQLException e) {
             String msg = "**********************************************\n" +
                     "*       Not connected to the Database.       *\n" +
@@ -30,7 +29,6 @@ public class FloristService {
                     "**********************************************";
 
             throw new NoConnectedDBException(msg);
-
         } finally {
             CONNECTION.disconnect();
         }
@@ -38,7 +36,8 @@ public class FloristService {
 
     public static int createFlorist() throws EmptyStringException, EmptySQLTableException {
         try {
-            stmt = CONNECTION.getConnection().prepareStatement(QueriesSQL.createNewFlorist);
+            connection = CONNECTION.getConnection();
+            stmt = connection.prepareStatement(QueriesSQL.createNewFlorist);
 
             System.out.println("Enter Florist name: ");
             userData = MainMenu.SC.nextLine();
@@ -49,38 +48,31 @@ public class FloristService {
                 System.out.println("florist: " + userData + " added to the database");
             } else throw new EmptyStringException("at create Florist");
 
-
-            stmt = CONNECTION.getConnection().prepareStatement(QueriesSQL.selectFloristID);
+            stmt = connection.prepareStatement(QueriesSQL.selectFloristID);
             stmt.setString(1, userData);
-
             res = stmt.executeQuery();
 
-            while (res.next()) return res.getInt("id_florist");
-
+            if (res.next()) return res.getInt("id_florist");
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-
         } finally {
             CONNECTION.disconnect();
         }
-
         return 0;
     }
 
     public static void printFlorist() {
         try {
-            CONNECTION.getConnection();
+            connection = CONNECTION.getConnection();
             Statement st = connection.createStatement();
             res = st.executeQuery(QueriesSQL.printFlorist);
 
             while (res.next())
                 System.out.println("ID: " + res.getInt("id_florist") + " - NAME: " + res.getString("name"));
 
-
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-
         } finally {
             CONNECTION.disconnect();
         }
@@ -88,7 +80,8 @@ public class FloristService {
 
     public static boolean floristExist(int id) throws EmptySQLTableException, SQLException {
         try {
-            stmt = CONNECTION.getConnection().prepareStatement(QueriesSQL.floristExists);
+            connection = CONNECTION.getConnection();
+            stmt = connection.prepareStatement(QueriesSQL.floristExists);
             stmt.setInt(1, id);
             res = stmt.executeQuery();
 
@@ -108,15 +101,14 @@ public class FloristService {
 
         try {
             if (floristExist(id)) {
-                stmt = CONNECTION.getConnection().prepareStatement(QueriesSQL.deleteFlorist);
+                connection = CONNECTION.getConnection();
+                stmt = connection.prepareStatement(QueriesSQL.deleteFlorist);
                 stmt.setInt(1, id);
                 stmt.executeUpdate();
                 System.out.println("florist id: " + id + " successfully deleted");
             }
-
         } catch (SQLException | EmptySQLTableException e) {
             System.out.println(e.getMessage());
-
         } finally {
             CONNECTION.disconnect();
         }
@@ -126,7 +118,8 @@ public class FloristService {
         String floristName = null;
 
         try {
-            stmt = CONNECTION.getConnection().prepareStatement(QueriesSQL.floristExists);
+            connection = CONNECTION.getConnection();
+            stmt = connection.prepareStatement(QueriesSQL.floristExists);
             stmt.setInt(1, floristId);
             res = stmt.executeQuery();
 
@@ -135,7 +128,6 @@ public class FloristService {
         } finally {
             CONNECTION.disconnect();
         }
-
         return floristName;
     }
 }
