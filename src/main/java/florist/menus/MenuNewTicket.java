@@ -153,9 +153,9 @@ public class MenuNewTicket {
         TicketService.completeTicket(floristId, PRODUCT_LIST);
         System.out.println("Ticket completed and stock updated.");
 
-        PRODUCT_LIST.clear();
-
         if (printTicketMenu()) System.out.println("Printed ticket in JSON.");
+
+        PRODUCT_LIST.clear();
 
         MenuTicket.ticketMenu(floristID);
     }
