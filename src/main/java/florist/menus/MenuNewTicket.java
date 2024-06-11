@@ -64,19 +64,26 @@ public class MenuNewTicket {
     }
 
     private static boolean printTicketMenu() {
+        do {
         System.out.println("Print ticket? [Y][N]");
         userData = MainMenu.SC.nextLine();
 
-        if (userData.equalsIgnoreCase("y")) {
-            try {
-                printTicket(floristID);
-                return true;
-            } catch (IOException | SQLException e) {
-                System.out.println("Error printing ticket: " + e.getMessage());
-                return false;
-            }
+    if (userData.equalsIgnoreCase("y")) {
+        try {
+            printTicket(floristID);
+            return true;
+        } catch (IOException | SQLException e) {
+            System.out.println("Error printing ticket: " + e.getMessage());
+            return false;
+        }
 
-        } else return false;
+    } else if (userData.equalsIgnoreCase("n")) {
+        return false;
+
+    }
+            System.out.println("Please select a valid option [Y] or [N]");
+} while (!userData.equalsIgnoreCase("n"));
+ return false;
 
     }
 

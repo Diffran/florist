@@ -1,0 +1,16 @@
+{
+  "id": 5,
+  "date": "Jun 11, 2024, 11:12:37 AM",
+  "florist": {
+    "id": 2,
+    "name": "bambino"
+  },
+  "productList": {
+    "19": {
+      "quantity": 22,
+      "price": 5.0,
+      "name": "Glass Ornament"
+    }
+  },
+  "totalPrice": 110.0
+}
