@@ -107,7 +107,7 @@ public class MenuNewTicket {
             productDetails.put("name", productName);
             productDetails.put("quantity", quantity);
             productDetails.put("price", productPrice);
-            productList.put(String.valueOf(productId), productDetails);
+            productList.put("Product ID: " + productId, productDetails);
         }
 
         ticket.setProductList(productList);
