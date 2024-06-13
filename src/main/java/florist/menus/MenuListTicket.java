@@ -3,6 +3,7 @@ package florist.menus;
 import florist.models.Ticket;
 import florist.services.ticket.TicketService;
 
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Locale;
@@ -28,6 +29,8 @@ public class MenuListTicket {
 
             } catch (NumberFormatException e) {
                 System.out.println("Error: Invalid option. Please enter a number. "+ e.getMessage());
+            } catch (SQLException e) {
+                System.out.println("Error: " + e.getMessage());
             }
 
         } while (optionTicket != 2);
@@ -39,7 +42,7 @@ public class MenuListTicket {
         System.out.println("2- EXIT");
     }
 
-    private static void showIndividualTicket(int floristId) throws NumberFormatException{
+    private static void showIndividualTicket(int floristId) throws NumberFormatException, SQLException {
         SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy", Locale.ENGLISH);
 
         System.out.println("Enter Ticket ID: ");

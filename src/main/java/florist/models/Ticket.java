@@ -60,41 +60,29 @@ public class Ticket {
     }
 
     private double calculateTotalPrice(HashMap<String, HashMap<String, Object>> productList) throws SQLException {
-        double totalPrice = 0.0;
-
         for (Map.Entry<String, HashMap<String, Object>> entry : productList.entrySet()) {
-            String key = entry.getKey();
-            String prefix = "Product ID: ";
+            int productId = Integer.parseInt(entry.getKey());
+            HashMap<String, Object> quantityData = entry.getValue();
+            Integer quantityInteger = (Integer) quantityData.get("quantity");
 
-            if (key.startsWith(prefix)) {
-                String productIDToFix = key.substring(prefix.length());
-                int productId = Integer.parseInt(productIDToFix);
-                HashMap<String, Object> quantityData = entry.getValue();
-                Integer quantityInteger = (Integer) quantityData.get("quantity");
+            if (quantityInteger != null) {
 
-                if (quantityInteger != null) {
-                    String query = QueriesSQL.getProductPrice;
-                    stmt = ConnectionSQL.getInstance().getConnection().prepareStatement(query);
-                    stmt.setInt(1, productId);
-                    res = stmt.executeQuery();
+                String query = QueriesSQL.getProductPrice;
+                stmt = ConnectionSQL.getInstance().getConnection().prepareStatement(query);
+                stmt.setInt(1, productId);
+                res = stmt.executeQuery();
 
-                    if (res.next()) {
-                        double price = res.getDouble("price");
-                        totalPrice += price * quantityInteger;
-                    }
-
-                    res.close();
-                    stmt.close();
-
-                } else {
-                    System.out.println("Error: Cantidad nula para el producto con ID: " + productId);
+                if (res.next()) {
+                    double price = res.getDouble("price");
+                    totalPrice += price * quantityInteger;
                 }
+
             } else {
-                System.out.println("Error: Clave de producto no empieza con el prefijo esperado.");
+                System.out.println("Error: Cantidad nula para el producto con ID: " + productId);
             }
         }
 
         return totalPrice;
     }
-    
+
 }

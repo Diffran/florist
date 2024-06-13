@@ -27,18 +27,19 @@ public class ProductService {
             System.out.println("Enter Tree quantity: ");
             int quantity = Integer.parseInt(MainMenu.SC.nextLine());
 
-            if (!name.isEmpty()) {
-                stmt.setDouble(1, price);
-                stmt.setString(2, name);
-                stmt.setString(3, "tree");
-                stmt.setNull(4, Types.VARCHAR);
-                stmt.setDouble(5, height);
-                stmt.setNull(6, Types.VARCHAR);
-                stmt.setInt(7, quantity);
-                stmt.executeUpdate();
-                System.out.println("Tree: " + name + " added to the database");
+            //Recomendación
+            if (name.isEmpty()) throw new EmptyStringException("at add Tree");
 
-            } else throw new EmptyStringException("at add Tree");
+            stmt.setDouble(1, price);
+            stmt.setString(2, name);
+            stmt.setString(3, "tree");
+            stmt.setNull(4, Types.VARCHAR);
+            stmt.setDouble(5, height);
+            stmt.setNull(6, Types.VARCHAR);
+            stmt.setInt(7, quantity);
+            stmt.executeUpdate();
+            System.out.println("Tree: " + name + " added to the database");
+
 
             CONNECTION.disconnect();
 
